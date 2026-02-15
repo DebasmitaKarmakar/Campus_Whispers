@@ -1,6 +1,7 @@
 
 import React, { useState } from 'react';
 import { authenticateUser } from '../services/authService';
+import { dbService } from '../services/dbService';
 import { User } from '../types';
 
 interface LoginProps {
@@ -18,13 +19,16 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
     e.preventDefault();
     setError(null);
 
+    const cleanEmail = email.trim();
+    const cleanId = institutionalId.trim();
+
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
+    if (!emailRegex.test(cleanEmail)) {
       setError('Invalid Credential: Enter a valid campus email');
       return;
     }
 
-    if (!institutionalId) {
+    if (!cleanId) {
       setError('Required: Provide Institutional ID');
       return;
     }
@@ -32,7 +36,7 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
     setIsLoading(true);
 
     try {
-      const user = await authenticateUser(email, institutionalId);
+      const user = await authenticateUser(cleanEmail, cleanId);
       if (user) {
         onLoginSuccess(user);
       } else {
@@ -48,7 +52,6 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
   return (
     <div className="w-full max-w-2xl px-4 py-12 flex flex-col items-center">
       <div className="w-full bg-white rounded-[3rem] shadow-[0_35px_60px_-15px_rgba(0,33,71,0.2)] border-2 border-nfsu-gold/20 overflow-hidden relative">
-        {/* Triple branding accent */}
         <div className="flex h-2 w-full">
           <div className="flex-1 bg-nfsu-navy"></div>
           <div className="flex-1 bg-nfsu-gold"></div>
@@ -56,7 +59,6 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2">
-          {/* Brand Panel */}
           <div className="bg-nfsu-navy p-12 text-white flex flex-col justify-center items-center text-center relative overflow-hidden">
             <div className="absolute inset-0 bg-institutional-pattern opacity-10"></div>
             <div className="relative z-10">
@@ -73,7 +75,6 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
             </div>
           </div>
 
-          {/* Form Panel */}
           <div className="p-10 lg:p-14 bg-white">
             <form onSubmit={handleSubmit} className="space-y-8">
               <div className="space-y-6">
@@ -109,8 +110,19 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
               </div>
 
               {error && (
-                <div className="bg-red-50 border-l-4 border-nfsu-maroon p-4 rounded-r-2xl animate-shake">
-                  <p className="text-[9px] text-nfsu-maroon font-black uppercase tracking-tight">{error}</p>
+                <div className="space-y-3">
+                  <div className="bg-red-50 border-l-4 border-nfsu-maroon p-4 rounded-r-2xl animate-shake">
+                    <p className="text-[9px] text-nfsu-maroon font-black uppercase tracking-tight">{error}</p>
+                  </div>
+                  {error.includes('whitelist') && (
+                    <button 
+                      type="button" 
+                      onClick={() => dbService.clearData()}
+                      className="text-[9px] font-black text-nfsu-navy underline decoration-nfsu-gold uppercase block text-center w-full"
+                    >
+                      Troubleshoot: Clear & Re-seed Whitelist
+                    </button>
+                  )}
                 </div>
               )}
 
@@ -139,40 +151,6 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
           </div>
         </div>
       </div>
-
-      <div className="mt-8 flex gap-4 opacity-40 grayscale hover:grayscale-0 transition-all">
-        <div className="w-8 h-8 rounded border border-nfsu-gold"></div>
-        <div className="w-8 h-8 rounded border border-nfsu-navy"></div>
-        <div className="w-8 h-8 rounded border border-nfsu-maroon"></div>
-      </div>
-
-      {/* Request Access Modal */}
-      {showRequestModal && (
-        <div className="fixed inset-0 bg-nfsu-navy/95 backdrop-blur-md z-[100] flex items-center justify-center p-6">
-           <div className="bg-white rounded-[3rem] p-12 max-w-md w-full border-4 border-nfsu-gold shadow-[0_0_100px_rgba(197,179,88,0.2)] animate-slideUp">
-             <div className="w-16 h-1 bg-nfsu-gold mb-8"></div>
-             <h3 className="text-3xl font-black text-nfsu-navy uppercase italic mb-6">Missing Identity</h3>
-             <p className="text-xs font-bold text-slate-500 uppercase leading-relaxed mb-10">
-               Access is restricted to verified NFSU entities. If your credentials are valid but rejected, please report to the IT coordinator.
-             </p>
-             <div className="space-y-4">
-               <div className="p-6 bg-nfsu-paper rounded-2xl border-2 border-slate-100 flex items-center gap-4">
-                 <div className="w-10 h-10 bg-nfsu-navy rounded-xl flex items-center justify-center text-white text-lg">✉</div>
-                 <div>
-                   <div className="text-[9px] font-black text-nfsu-gold uppercase mb-0.5">Direct Support</div>
-                   <div className="text-xs font-black text-nfsu-navy">auth@nfsu.ac.in</div>
-                 </div>
-               </div>
-               <button 
-                onClick={() => setShowRequestModal(false)}
-                className="w-full py-5 bg-nfsu-navy text-white font-black rounded-2xl uppercase text-[10px] tracking-widest shadow-xl border-b-4 border-black/20 active:translate-y-1 active:border-b-0 transition-all"
-               >
-                 Return to Login
-               </button>
-             </div>
-           </div>
-        </div>
-      )}
     </div>
   );
 };

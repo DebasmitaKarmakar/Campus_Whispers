@@ -7,7 +7,6 @@ import { User, AuthState } from './types';
 
 const App: React.FC = () => {
   const [authState, setAuthState] = useState<AuthState>(() => {
-    // Check local storage for existing session on load
     const savedUser = localStorage.getItem('cw_user');
     if (savedUser) {
       return {
@@ -21,27 +20,34 @@ const App: React.FC = () => {
     };
   });
 
+  useEffect(() => {
+    // Listen for changes from other tabs
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'cw_user') {
+        if (e.newValue) {
+          setAuthState({ user: JSON.parse(e.newValue), isAuthenticated: true });
+        } else {
+          setAuthState({ user: null, isAuthenticated: false });
+        }
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
+
   const handleLoginSuccess = (user: User) => {
-    setAuthState({
-      user,
-      isAuthenticated: true
-    });
+    setAuthState({ user, isAuthenticated: true });
     localStorage.setItem('cw_user', JSON.stringify(user));
   };
 
   const handleUpdateUser = (updatedUser: User) => {
-    setAuthState(prev => ({
-      ...prev,
-      user: updatedUser
-    }));
+    setAuthState(prev => ({ ...prev, user: updatedUser }));
     localStorage.setItem('cw_user', JSON.stringify(updatedUser));
   };
 
   const handleLogout = () => {
-    setAuthState({
-      user: null,
-      isAuthenticated: false
-    });
+    setAuthState({ user: null, isAuthenticated: false });
     localStorage.removeItem('cw_user');
   };
 

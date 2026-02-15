@@ -6,8 +6,9 @@ const DB_PREFIX = 'cw_db_';
 export const dbService = {
   // Initialize Database with Seed Data
   init: () => {
-    // 1. Students Table
-    if (!localStorage.getItem(`${DB_PREFIX}students`)) {
+    const students = dbService.getTable<StudentMaster>('students');
+    // Re-seed if missing OR empty
+    if (students.length === 0) {
       const initialStudents: StudentMaster[] = [
         { id: 'STU-4000', email: 'stu@gmail.com', institutionalId: '4000', fullName: 'Student User', department: 'Cyber Security', role: 'student', status: 'Active', createdAt: Date.now() },
         { id: 'STU-4001', email: 'test@gmail.com', institutionalId: '4001', fullName: 'Test Student', department: 'Digital Forensics', role: 'student', status: 'Active', createdAt: Date.now() },
@@ -18,8 +19,8 @@ export const dbService = {
       dbService.saveTable('students', initialStudents);
     }
 
-    // 2. Canteen Menu Table
-    if (!localStorage.getItem(`${DB_PREFIX}canteen_menu`)) {
+    const menu = dbService.getTable<MenuItem>('canteen_menu');
+    if (menu.length === 0) {
       const initialMenu: MenuItem[] = [
         { id: 'MENU-01', name: 'Masala Dosa', price: 40, category: 'Breakfast', available: true, createdBy: 'ADM-1000' },
         { id: 'MENU-02', name: 'Idli Vada', price: 35, category: 'Breakfast', available: true, createdBy: 'ADM-1000' },
@@ -31,8 +32,8 @@ export const dbService = {
       dbService.saveTable('canteen_menu', initialMenu);
     }
 
-    // 3. Opportunities Table
-    if (!localStorage.getItem(`${DB_PREFIX}opportunities`)) {
+    const opps = dbService.getTable<OpportunityPost>('opportunities');
+    if (opps.length === 0) {
       const initialOpps: OpportunityPost[] = [
         {
           id: 'OP-1001',
@@ -45,22 +46,19 @@ export const dbService = {
           posterEmail: 'ad@gmail.com',
           posterRole: 'admin',
           createdAt: Date.now()
-        },
-        {
-          id: 'OP-1002',
-          title: 'Cyber Security Workshop - Phase I',
-          mode: 'Offline',
-          deadline: '2025-06-15',
-          description: 'Hands-on workshop on penetration testing techniques.',
-          status: 'Active',
-          posterId: 'ADM-1000',
-          posterEmail: 'ad@gmail.com',
-          posterRole: 'admin',
-          createdAt: Date.now()
         }
       ];
       dbService.saveTable('opportunities', initialOpps);
     }
+  },
+
+  clearData: () => {
+    Object.keys(localStorage).forEach(key => {
+      if (key.startsWith(DB_PREFIX) || key.startsWith('cw_user') || key.startsWith('profile_data_')) {
+        localStorage.removeItem(key);
+      }
+    });
+    window.location.reload();
   },
 
   getTable: <T>(tableName: string): T[] => {
@@ -70,6 +68,8 @@ export const dbService = {
 
   saveTable: <T>(tableName: string, data: T[]) => {
     localStorage.setItem(`${DB_PREFIX}${tableName}`, JSON.stringify(data));
+    // Dispatch custom event for same-tab updates
+    window.dispatchEvent(new CustomEvent('cw_db_update', { detail: { table: tableName } }));
   },
 
   addRow: <T>(tableName: string, row: T) => {
