@@ -54,7 +54,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ user, onLogout, onUpdateUs
                   </button>
                   <div>
                     <h2 className="text-4xl font-black text-nfsu-navy tracking-tighter italic uppercase leading-tight mb-1">
-                      {user.preferredName || user.fullName.split(' ')[0]} <span className="text-nfsu-gold">HUB</span>
+                      {user.preferredName || user.fullName.split(' ')[0]}'s <span className="text-nfsu-gold">Dashboard</span>
                     </h2>
                     <div className="flex flex-wrap gap-3 items-center">
                       <span className="px-3 py-1 bg-nfsu-maroon text-white text-[9px] font-black rounded uppercase tracking-widest">{user.role} AUTH</span>

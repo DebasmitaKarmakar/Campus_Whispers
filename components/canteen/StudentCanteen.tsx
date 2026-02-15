@@ -1,15 +1,15 @@
 
 import React, { useState, useEffect } from 'react';
 import { canteenService } from '../../services/canteenService';
-import { User, Order, MenuItem, MealType } from '../../types';
+import { User, Order, MenuItem, MealType, CanteenConfig } from '../../types';
 
 export const StudentCanteen: React.FC<{ user: User }> = ({ user }) => {
-  const [config] = useState(canteenService.getConfig());
+  const [config, setConfig] = useState<CanteenConfig>(canteenService.getConfig());
   const [orders, setOrders] = useState<Order[]>([]);
   const [cart, setCart] = useState<{ [key: string]: number }>({});
   const [activeTab, setActiveTab] = useState<MealType>('Lunch');
   
-  // Feedback States - Initialized to 0 to ensure user selects
+  // Feedback States
   const [showFeedbackModal, setShowFeedbackModal] = useState<Order | null>(null);
   const [feedbackRatings, setFeedbackRatings] = useState({ taste: 0, quantity: 0, hygiene: 0 });
   
@@ -20,15 +20,23 @@ export const StudentCanteen: React.FC<{ user: User }> = ({ user }) => {
   const [hasOrdered, setHasOrdered] = useState(false);
   const [editingOrderId, setEditingOrderId] = useState<string | null>(null);
 
-  const fetchOrders = () => {
+  const fetchData = () => {
+    // Refresh both orders and global canteen config (menu + slot status)
     const allOrders = canteenService.getOrders();
     const userOrders = allOrders.filter(o => o.studentEmail === user.email);
     setOrders(userOrders);
+    
+    const currentConfig = canteenService.getConfig();
+    setConfig(currentConfig);
+    
     setHasOrdered(canteenService.hasOrderedForSlot(user.email, activeTab));
   };
 
   useEffect(() => {
-    fetchOrders();
+    fetchData();
+    // Refresh every 10 seconds to catch menu updates from staff
+    const interval = setInterval(fetchData, 10000);
+    return () => clearInterval(interval);
   }, [user.email, activeTab]);
 
   const addToCart = (itemName: string) => {
@@ -50,7 +58,7 @@ export const StudentCanteen: React.FC<{ user: User }> = ({ user }) => {
       }
       
       setCart({});
-      fetchOrders();
+      fetchData();
     } catch (e: any) {
       alert(e.message);
     }
@@ -65,7 +73,7 @@ export const StudentCanteen: React.FC<{ user: User }> = ({ user }) => {
       canteenService.cancelOrder(showCancelModal, cancelReason);
       setShowCancelModal(null);
       setCancelReason('');
-      fetchOrders();
+      fetchData();
     }
   };
 
@@ -92,7 +100,7 @@ export const StudentCanteen: React.FC<{ user: User }> = ({ user }) => {
       });
       setShowFeedbackModal(null);
       setFeedbackRatings({ taste: 0, quantity: 0, hygiene: 0 });
-      fetchOrders();
+      fetchData();
     }
   };
 

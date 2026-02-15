@@ -20,18 +20,6 @@ export const AdminCanteen: React.FC<{ user: User }> = ({ user }) => {
     return () => clearInterval(interval);
   }, []);
 
-  const toggleSlot = (slot: MealType) => {
-    const newConfig = {
-      ...config,
-      isOrderingOpen: {
-        ...config.isOrderingOpen,
-        [slot]: !config.isOrderingOpen[slot]
-      }
-    };
-    setConfig(newConfig);
-    canteenService.saveConfig({ isOrderingOpen: newConfig.isOrderingOpen });
-  };
-
   const avgRating = (cat: 'taste' | 'quantity' | 'hygiene') => {
     if (feedbacks.length === 0) return 0;
     const sum = feedbacks.reduce((acc, f) => acc + f[cat], 0);
@@ -62,17 +50,12 @@ export const AdminCanteen: React.FC<{ user: User }> = ({ user }) => {
         {(['Breakfast', 'Lunch', 'Dinner'] as MealType[]).map(slot => (
           <div key={slot} className="bg-white p-8 rounded-[2rem] shadow-xl border-2 border-slate-100 relative overflow-hidden">
             <div className={`absolute top-0 right-0 w-2 h-full ${config.isOrderingOpen[slot] ? 'bg-green-500' : 'bg-red-500'}`}></div>
-            <h3 className="font-black text-xl text-nfsu-navy uppercase italic mb-6">{slot} Window</h3>
-            <button
-              onClick={() => toggleSlot(slot)}
-              className={`w-full py-4 rounded-2xl font-black text-[10px] transition-all uppercase tracking-widest border-2 ${
-                config.isOrderingOpen[slot] 
-                ? 'bg-red-50 text-red-700 border-red-200 hover:bg-red-100' 
-                : 'bg-green-50 text-green-700 border-green-200 hover:bg-green-100'
-              }`}
-            >
-              {config.isOrderingOpen[slot] ? 'Terminate Slot' : 'Authorize Slot'}
-            </button>
+            <h3 className="font-black text-xl text-nfsu-navy uppercase italic mb-2">{slot} Window</h3>
+            <div className={`text-[10px] font-black uppercase tracking-widest flex items-center gap-2 ${config.isOrderingOpen[slot] ? 'text-green-600' : 'text-red-600'}`}>
+               <span className={`w-2 h-2 rounded-full ${config.isOrderingOpen[slot] ? 'bg-green-600' : 'bg-red-600'} animate-pulse`}></span>
+               {config.isOrderingOpen[slot] ? 'Receiving Orders' : 'Portal Closed'}
+            </div>
+            <p className="mt-4 text-[9px] text-slate-400 font-bold uppercase tracking-tight">Admin Level: View Only (Toggle Restricted to Canteen Staff)</p>
           </div>
         ))}
       </div>
