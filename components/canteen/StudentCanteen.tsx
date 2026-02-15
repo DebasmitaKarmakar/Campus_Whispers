@@ -314,6 +314,12 @@ export const StudentCanteen: React.FC<{ user: User }> = ({ user }) => {
                     </div>
                   )}
 
+                  {o.status === 'Expired' && o.declineReason && (
+                    <div className="mt-3 p-3 bg-red-50 rounded-xl border border-red-100">
+                      <p className="text-[9px] font-black uppercase text-red-700 tracking-tighter italic">DECLINE REASON: {o.declineReason}</p>
+                    </div>
+                  )}
+
                   <div className="mt-6 pt-4 border-t border-slate-200 space-y-4">
                     <div className="flex flex-col gap-1">
                       <div className="flex justify-between text-[9px] font-black uppercase tracking-widest text-slate-400">

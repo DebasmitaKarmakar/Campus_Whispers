@@ -12,6 +12,10 @@ export const StaffCanteen: React.FC<{ user: User }> = ({ user }) => {
   // Menu Item Form State
   const [newItem, setNewItem] = useState({ name: '', price: '', category: 'Lunch' as MealType });
 
+  // Decline State
+  const [showDeclineModal, setShowDeclineModal] = useState<string | null>(null);
+  const [declineReason, setDeclineReason] = useState('');
+
   useEffect(() => {
     const fetch = () => {
       setOrders(canteenService.getOrders());
@@ -23,9 +27,21 @@ export const StaffCanteen: React.FC<{ user: User }> = ({ user }) => {
     return () => clearInterval(interval);
   }, []);
 
-  const handleAction = (id: string, action: 'Served' | 'Expired') => {
-    canteenService.updateOrderStatus(id, action);
+  const handleAction = (id: string, action: 'Served' | 'Expired', reason?: string) => {
+    canteenService.updateOrderStatus(id, action, reason);
     setOrders(canteenService.getOrders());
+  };
+
+  const confirmDecline = () => {
+    if (!declineReason.trim()) {
+      alert('Institutional accountability requires a reason for declining orders.');
+      return;
+    }
+    if (showDeclineModal) {
+      handleAction(showDeclineModal, 'Expired', declineReason);
+      setShowDeclineModal(null);
+      setDeclineReason('');
+    }
   };
 
   const handleAddItem = (e: React.FormEvent) => {
@@ -77,6 +93,34 @@ export const StaffCanteen: React.FC<{ user: User }> = ({ user }) => {
 
   return (
     <div className="w-full max-w-7xl space-y-10 animate-fadeIn pb-20">
+      {showDeclineModal && (
+        <div className="fixed inset-0 bg-nfsu-navy/95 backdrop-blur-md flex items-center justify-center z-[120] p-4">
+          <div className="bg-white rounded-[2.5rem] p-10 max-w-md w-full shadow-2xl border-4 border-nfsu-maroon">
+            <h3 className="text-2xl font-black text-nfsu-maroon text-center mb-6 uppercase italic">Decline Order</h3>
+            <textarea
+              className="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl text-xs font-bold h-32 outline-none focus:border-nfsu-maroon uppercase mb-6"
+              placeholder="ENTER REASON FOR DECLINING..."
+              value={declineReason}
+              onChange={(e) => setDeclineReason(e.target.value)}
+            />
+            <div className="flex gap-4">
+              <button 
+                onClick={() => { setShowDeclineModal(null); setDeclineReason(''); }}
+                className="flex-1 py-4 bg-slate-100 text-slate-400 font-black rounded-xl text-[10px] uppercase tracking-widest border-b-4 border-slate-200"
+              >
+                Go Back
+              </button>
+              <button 
+                onClick={confirmDecline}
+                className="flex-2 py-4 bg-nfsu-maroon text-white font-black rounded-xl text-[10px] uppercase tracking-[0.2em] shadow-xl border-b-4 border-black/20"
+              >
+                Confirm Decline
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 bg-nfsu-navy p-10 rounded-[2.5rem] border-b-8 border-nfsu-gold/50 shadow-2xl text-white">
         <div>
           <h2 className="text-3xl font-black tracking-tighter uppercase italic">Service Operations</h2>
@@ -233,7 +277,7 @@ export const StaffCanteen: React.FC<{ user: User }> = ({ user }) => {
 
                     <div className="grid grid-cols-2 gap-4">
                       <button onClick={() => handleAction(o.id, 'Served')} className="py-5 bg-green-600 text-white rounded-2xl font-black text-[10px] uppercase border-b-4 border-black/20 shadow-xl transition-all active:scale-95">Mark Served</button>
-                      <button onClick={() => handleAction(o.id, 'Expired')} className="py-5 bg-white text-slate-400 rounded-2xl font-black text-[10px] border-2 border-slate-100 hover:border-nfsu-maroon hover:text-nfsu-maroon transition-all">Decline</button>
+                      <button onClick={() => setShowDeclineModal(o.id)} className="py-5 bg-white text-slate-400 rounded-2xl font-black text-[10px] border-2 border-slate-100 hover:border-nfsu-maroon hover:text-nfsu-maroon transition-all">Decline</button>
                     </div>
                   </div>
                 ))

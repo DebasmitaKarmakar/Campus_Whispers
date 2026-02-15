@@ -11,10 +11,15 @@ interface MyProfileProps {
 export const MyProfile: React.FC<MyProfileProps> = ({ user, onProfileUpdate }) => {
   const [summary, setSummary] = useState<ProfileActivitySummary | null>(null);
   const [preferredName, setPreferredName] = useState(user.preferredName || '');
+  const [department, setDepartment] = useState(user.department || '');
   const [isUpdating, setIsUpdating] = useState(false);
 
-  useEffect(() => {
+  const fetchSummary = () => {
     setSummary(profileService.getActivitySummary(user.email));
+  };
+
+  useEffect(() => {
+    fetchSummary();
   }, [user.email]);
 
   const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -30,12 +35,15 @@ export const MyProfile: React.FC<MyProfileProps> = ({ user, onProfileUpdate }) =
     }
   };
 
-  const handleUpdatePreferredName = (e: React.FormEvent) => {
+  const handleUpdateProfile = (e: React.FormEvent) => {
     e.preventDefault();
     setIsUpdating(true);
-    profileService.updateProfile(user.email, { preferredName });
-    onProfileUpdate({ ...user, preferredName });
-    setTimeout(() => setIsUpdating(false), 500);
+    profileService.updateProfile(user.email, { preferredName, department });
+    onProfileUpdate({ ...user, preferredName, department });
+    setTimeout(() => {
+      setIsUpdating(false);
+      fetchSummary();
+    }, 500);
   };
 
   if (!summary) return null;
@@ -74,8 +82,8 @@ export const MyProfile: React.FC<MyProfileProps> = ({ user, onProfileUpdate }) =
             
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-lg">
               <div className="bg-white/5 border border-white/10 p-4 rounded-2xl">
-                <div className="text-[10px] font-black text-nfsu-gold/50 uppercase mb-1 tracking-widest">Enrollment No.</div>
-                <div className="text-white font-mono font-black tracking-widest">{user.enrollment}</div>
+                <div className="text-[10px] font-black text-nfsu-gold/50 uppercase mb-1 tracking-widest">Institutional ID</div>
+                <div className="text-white font-mono font-black tracking-widest">{user.institutionalId}</div>
               </div>
               <div className="bg-white/5 border border-white/10 p-4 rounded-2xl">
                 <div className="text-[10px] font-black text-nfsu-gold/50 uppercase mb-1 tracking-widest">Account Status</div>
@@ -88,11 +96,11 @@ export const MyProfile: React.FC<MyProfileProps> = ({ user, onProfileUpdate }) =
           </div>
         </div>
 
-        <div className="p-10 grid grid-cols-1 md:grid-cols-3 gap-10 bg-slate-50/50">
-          <div className="md:col-span-2 space-y-6">
-            <h3 className="text-lg font-black text-nfsu-navy uppercase tracking-[0.2em] italic">Settings</h3>
-            <form onSubmit={handleUpdatePreferredName} className="flex flex-col sm:flex-row gap-4">
-              <div className="flex-1">
+        <div className="p-10 bg-slate-50/50">
+          <form onSubmit={handleUpdateProfile} className="space-y-8">
+            <h3 className="text-lg font-black text-nfsu-navy uppercase tracking-[0.2em] italic">Identity Settings</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
                 <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Preferred Display Name</label>
                 <input 
                   type="text" 
@@ -102,29 +110,34 @@ export const MyProfile: React.FC<MyProfileProps> = ({ user, onProfileUpdate }) =
                   placeholder="Enter alias (Optional)"
                 />
               </div>
+              <div>
+                <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Current Branch / Department</label>
+                <input 
+                  type="text" 
+                  className="w-full p-4 bg-white border-2 border-slate-100 rounded-2xl text-sm font-bold focus:border-nfsu-navy outline-none"
+                  value={department}
+                  onChange={e => setDepartment(e.target.value)}
+                  placeholder="E.G. CYBER SECURITY, DIGITAL FORENSICS..."
+                />
+              </div>
+            </div>
+            <div className="flex justify-between items-center">
+              <div className="space-y-1">
+                 <h3 className="text-sm font-black text-nfsu-navy uppercase tracking-[0.1em]">Timeline</h3>
+                 <div className="flex gap-4">
+                   <span className="text-[9px] font-bold text-slate-400 uppercase">Last Login: {new Date(user.lastLogin).toLocaleString()}</span>
+                   <span className="text-[9px] font-bold text-slate-400 uppercase">Created: {new Date(user.createdAt).toLocaleDateString()}</span>
+                 </div>
+              </div>
               <button 
                 type="submit" 
                 disabled={isUpdating}
-                className="self-end px-10 py-4 bg-nfsu-navy text-white font-black rounded-2xl text-[10px] uppercase tracking-widest hover:bg-nfsu-maroon transition-all shadow-xl shadow-nfsu-navy/20 disabled:opacity-50"
+                className="px-10 py-4 bg-nfsu-navy text-white font-black rounded-2xl text-[10px] uppercase tracking-widest hover:bg-nfsu-maroon transition-all shadow-xl shadow-nfsu-navy/20 disabled:opacity-50"
               >
-                {isUpdating ? 'Updating...' : 'Save Change'}
+                {isUpdating ? 'Updating...' : 'Save Registry Changes'}
               </button>
-            </form>
-          </div>
-          
-          <div className="space-y-4">
-             <h3 className="text-lg font-black text-nfsu-navy uppercase tracking-[0.2em] italic">Timeline</h3>
-             <div className="space-y-2">
-               <div className="flex justify-between p-4 bg-white rounded-2xl border border-slate-100">
-                 <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Last Login</span>
-                 <span className="text-[10px] font-bold text-slate-600">{new Date(user.lastLogin).toLocaleString()}</span>
-               </div>
-               <div className="flex justify-between p-4 bg-white rounded-2xl border border-slate-100">
-                 <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Account Created</span>
-                 <span className="text-[10px] font-bold text-slate-600">{new Date(user.createdAt).toLocaleDateString()}</span>
-               </div>
-             </div>
-          </div>
+            </div>
+          </form>
         </div>
       </div>
 
@@ -228,7 +241,7 @@ export const MyProfile: React.FC<MyProfileProps> = ({ user, onProfileUpdate }) =
       <div className="bg-nfsu-maroon p-10 rounded-[3rem] text-white shadow-2xl border-b-8 border-black/20">
         <h4 className="text-xl font-black uppercase italic tracking-tighter mb-4">Identity Verification & Accountability</h4>
         <p className="text-white/60 text-xs font-bold leading-relaxed uppercase tracking-tight">
-          CampusWhispers utilizes high-integrity identity binding. Your profile summary reflects your verified contributions to the NFSU student community. 
+          CampusWhispers utilizes high-integrity identity binding. Your profile summary reflects your verified contributions to the NFSU institutional community. 
           Misrepresentation or misuse of institutional modules is tracked for audit integrity.
         </p>
       </div>

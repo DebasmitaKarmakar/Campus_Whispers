@@ -7,16 +7,17 @@ export const AdminStudentManager: React.FC = () => {
   const [students, setStudents] = useState<StudentMaster[]>(dbService.getTable<StudentMaster>('students'));
   const [search, setSearch] = useState('');
   const [isAdding, setIsAdding] = useState(false);
-  const [newStu, setNewStu] = useState({ email: '', enrollment: '', fullName: '', department: '', role: 'student' as Role });
+  const [newStu, setNewStu] = useState({ email: '', institutionalId: '', fullName: '', department: '', role: 'student' as Role });
 
   const refresh = () => setStudents(dbService.getTable<StudentMaster>('students'));
 
   const handleAdd = (e: React.FormEvent) => {
     e.preventDefault();
-    const id = `${newStu.role === 'admin' ? 'ADM' : 'STU'}-${newStu.enrollment}`;
+    const id = `${newStu.role === 'admin' ? 'ADM' : newStu.role === 'staff' ? 'STA' : 'STU'}-${newStu.institutionalId}`;
     const entry: StudentMaster = { ...newStu, id, status: 'Active', createdAt: Date.now() };
     dbService.saveTable('students', [entry, ...students]);
     setIsAdding(false);
+    setNewStu({ email: '', institutionalId: '', fullName: '', department: '', role: 'student' });
     refresh();
   };
 
@@ -25,13 +26,13 @@ export const AdminStudentManager: React.FC = () => {
     refresh();
   };
 
-  const filtered = students.filter(s => s.fullName.toLowerCase().includes(search.toLowerCase()) || s.enrollment.includes(search));
+  const filtered = students.filter(s => s.fullName.toLowerCase().includes(search.toLowerCase()) || s.institutionalId.includes(search));
 
   return (
     <div className="w-full max-w-5xl space-y-8 animate-fadeIn">
       <div className="bg-nfsu-navy p-10 rounded-[2.5rem] text-white flex justify-between items-center border-b-8 border-nfsu-gold">
         <div>
-          <h2 className="text-3xl font-black uppercase italic tracking-tighter">Student Master Table</h2>
+          <h2 className="text-3xl font-black uppercase italic tracking-tighter">Institutional Identity Registry</h2>
           <p className="text-nfsu-gold/60 text-[10px] font-black uppercase tracking-[0.3em]">Institutional Identity Oversight</p>
         </div>
         <button onClick={() => setIsAdding(true)} className="px-8 py-4 bg-white text-nfsu-navy rounded-2xl font-black uppercase text-[10px] tracking-widest hover:bg-nfsu-gold transition-all">Add Whitelist Entry</button>
@@ -62,7 +63,7 @@ export const AdminStudentManager: React.FC = () => {
                 <tr key={s.id} className="group hover:bg-slate-50/50 transition-colors">
                   <td className="p-4">
                     <div className="font-black text-nfsu-navy uppercase text-sm">{s.fullName}</div>
-                    <div className="text-[10px] font-bold text-slate-400 uppercase">{s.id} • {s.email}</div>
+                    <div className="text-[10px] font-bold text-slate-400 uppercase">{s.institutionalId} • {s.email}</div>
                   </td>
                   <td className="p-4 text-[10px] font-black text-slate-500 uppercase">{s.department}</td>
                   <td className="p-4">
@@ -92,7 +93,7 @@ export const AdminStudentManager: React.FC = () => {
              <input required placeholder="FULL NAME" className="w-full p-4 bg-slate-50 rounded-2xl border-2 border-slate-100 uppercase font-black text-xs" value={newStu.fullName} onChange={e => setNewStu({...newStu, fullName: e.target.value})} />
              <input required type="email" placeholder="INSTITUTIONAL EMAIL" className="w-full p-4 bg-slate-50 rounded-2xl border-2 border-slate-100 uppercase font-black text-xs" value={newStu.email} onChange={e => setNewStu({...newStu, email: e.target.value})} />
              <div className="grid grid-cols-2 gap-4">
-                <input required placeholder="ENROLLMENT" className="p-4 bg-slate-50 rounded-2xl border-2 border-slate-100 uppercase font-black text-xs" value={newStu.enrollment} onChange={e => setNewStu({...newStu, enrollment: e.target.value})} />
+                <input required placeholder="INSTITUTIONAL ID" className="p-4 bg-slate-50 rounded-2xl border-2 border-slate-100 uppercase font-black text-xs" value={newStu.institutionalId} onChange={e => setNewStu({...newStu, institutionalId: e.target.value})} />
                 <select className="p-4 bg-slate-50 rounded-2xl border-2 border-slate-100 uppercase font-black text-xs" value={newStu.role} onChange={e => setNewStu({...newStu, role: e.target.value as Role})}>
                   <option value="student">Student</option>
                   <option value="admin">Admin</option>

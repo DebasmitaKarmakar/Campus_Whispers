@@ -72,7 +72,7 @@ export const profileService = {
     };
   },
 
-  updateProfile: (userEmail: string, data: { preferredName?: string, profilePhoto?: string }) => {
+  updateProfile: (userEmail: string, data: { preferredName?: string, profilePhoto?: string, department?: string }) => {
     // Standardized Key: profile_data_email
     const key = `profile_data_${userEmail.toLowerCase()}`;
     const existing = JSON.parse(localStorage.getItem(key) || '{}');

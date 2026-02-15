@@ -7,7 +7,7 @@ export type AccountStatus = 'Active' | 'Disabled';
 export interface StudentMaster {
   id: string; // Primary Key
   email: string;
-  enrollment: string;
+  institutionalId: string; // Changed from enrollment for staff/faculty compatibility
   fullName: string;
   department: string;
   role: Role;
@@ -56,6 +56,7 @@ export interface Order {
   timestamp: number;
   servedTimestamp?: number;
   cancelReason?: string;
+  declineReason?: string; // New field for staff decline reasoning
   type: MealType;
   feedbackSubmitted: boolean;
 }

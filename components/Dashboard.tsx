@@ -37,84 +37,110 @@ export const Dashboard: React.FC<DashboardProps> = ({ user, onLogout, onUpdateUs
         return <AdminStudentManager />;
       default:
         return (
-          <div className="w-full max-w-5xl space-y-8">
-            <div className="bg-white rounded-[2.5rem] shadow-2xl border-2 border-nfsu-navy/5 overflow-hidden">
-              <div className="p-10 border-b-2 border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-6 bg-slate-50/50">
-                <div className="flex items-center gap-6">
+          <div className="w-full max-w-6xl space-y-10 animate-fadeIn">
+            {/* Identity Card Header */}
+            <div className="bg-white rounded-[3rem] shadow-2xl border-2 border-nfsu-gold/20 overflow-hidden">
+              <div className="p-8 lg:p-12 border-b-2 border-nfsu-paper flex flex-col md:flex-row md:items-center justify-between gap-8 bg-gradient-to-br from-nfsu-paper to-white">
+                <div className="flex items-center gap-8">
                   <button onClick={() => setView('profile')} className="group relative">
-                    <div className="w-16 h-16 bg-nfsu-navy rounded-2xl flex items-center justify-center p-1 border-2 border-nfsu-gold shadow-xl overflow-hidden">
+                    <div className="w-24 h-24 bg-nfsu-navy rounded-[2rem] flex items-center justify-center p-1.5 border-4 border-nfsu-gold shadow-2xl overflow-hidden transform group-hover:rotate-6 transition-transform">
                       {user.profilePhoto ? (
-                        <img src={user.profilePhoto} className="w-full h-full object-cover rounded-xl" alt="Profile" />
+                        <img src={user.profilePhoto} className="w-full h-full object-cover rounded-[1.5rem]" alt="Profile" />
                       ) : (
-                        <span className="text-white font-black text-xl italic">{user.fullName.charAt(0)}</span>
+                        <span className="text-white font-black text-3xl italic">{user.fullName.charAt(0)}</span>
                       )}
                     </div>
+                    <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-nfsu-gold rounded-full border-4 border-white flex items-center justify-center text-[10px] font-black shadow-lg">✓</div>
                   </button>
                   <div>
-                    <h2 className="text-4xl font-black text-nfsu-navy tracking-tighter italic uppercase leading-none">
-                      {user.preferredName || user.fullName.split(' ')[0]} Hub
+                    <h2 className="text-4xl font-black text-nfsu-navy tracking-tighter italic uppercase leading-tight mb-1">
+                      {user.preferredName || user.fullName.split(' ')[0]} <span className="text-nfsu-gold">HUB</span>
                     </h2>
-                    <p className="text-slate-500 mt-2 font-bold text-xs uppercase tracking-widest">{user.role} Authorization • {user.department}</p>
+                    <div className="flex flex-wrap gap-3 items-center">
+                      <span className="px-3 py-1 bg-nfsu-maroon text-white text-[9px] font-black rounded uppercase tracking-widest">{user.role} AUTH</span>
+                      <span className="text-slate-400 font-black text-[10px] uppercase tracking-widest">{user.department} REGISTRY</span>
+                    </div>
                   </div>
                 </div>
-                <div className="flex gap-4">
+                <div className="flex flex-wrap gap-3">
                   {user.role === 'admin' && (
-                    <button onClick={() => setView('students')} className="px-6 py-3 bg-nfsu-gold text-nfsu-navy font-black rounded-2xl shadow-sm uppercase text-[10px] tracking-widest border-b-4 border-black/10">Manage Students</button>
+                    <button onClick={() => setView('students')} className="px-6 py-4 bg-nfsu-gold text-nfsu-navy font-black rounded-2xl shadow-xl hover:bg-white hover:ring-2 hover:ring-nfsu-gold transition-all uppercase text-[10px] tracking-widest border-b-4 border-black/10">Manage Whitelist</button>
                   )}
-                  <button onClick={() => setView('profile')} className="px-6 py-3 bg-slate-50 border-2 border-slate-100 text-slate-600 font-black rounded-2xl uppercase text-[10px] tracking-widest">My Profile</button>
-                  <button onClick={onLogout} className="px-6 py-3 bg-white border-2 border-slate-200 text-slate-600 font-black rounded-2xl uppercase text-[10px] tracking-widest">Sign Out</button>
+                  <button onClick={() => setView('profile')} className="px-6 py-4 bg-nfsu-navy text-white font-black rounded-2xl uppercase text-[10px] tracking-widest hover:bg-nfsu-maroon transition-all shadow-xl">Profile Setup</button>
+                  <button onClick={onLogout} className="px-6 py-4 bg-white border-2 border-slate-200 text-slate-400 font-black rounded-2xl uppercase text-[10px] tracking-widest hover:border-nfsu-maroon hover:text-nfsu-maroon transition-all">Exit Portal</button>
                 </div>
               </div>
               
-              <div className="p-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                {/* Canteen View - Shared by all but functionality differs */}
-                <button onClick={() => setView('canteen')} className="text-left p-8 bg-white rounded-3xl border-2 border-slate-100 hover:border-nfsu-navy transition-all group shadow-sm">
-                  <h3 className="font-black text-nfsu-navy mb-3 text-lg uppercase italic">
-                    {user.role === 'admin' ? 'Canteen Audit' : user.role === 'staff' ? 'Canteen Service' : 'Order Food'}
-                  </h3>
-                  <p className="text-xs text-slate-500 font-bold leading-relaxed">
-                    {user.role === 'admin' ? 'Strategic menu audit and feedback review.' : user.role === 'staff' ? 'Manage active orders and daily menu registry.' : 'Access standardized university nutrition plan.'}
-                  </p>
+              <div className="p-8 lg:p-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                {/* Module Cards */}
+                <button onClick={() => setView('canteen')} className="text-left p-8 bg-nfsu-paper rounded-[2.5rem] border-2 border-transparent hover:border-nfsu-navy hover:bg-white transition-all group shadow-sm flex flex-col justify-between h-full min-h-[220px]">
+                  <div>
+                    <div className="w-12 h-12 bg-white rounded-xl shadow-inner flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">🍱</div>
+                    <h3 className="font-black text-nfsu-navy mb-3 text-lg uppercase italic group-hover:text-nfsu-maroon transition-colors">
+                      {user.role === 'admin' ? 'Canteen Audit' : user.role === 'staff' ? 'Service Ops' : 'Meal Registry'}
+                    </h3>
+                    <p className="text-[10px] text-slate-500 font-black uppercase tracking-tight leading-relaxed opacity-80">
+                      {user.role === 'admin' ? 'Review operational compliance and feedback.' : user.role === 'staff' ? 'Manage active pipeline and inventory.' : 'Standardized university nutrition access.'}
+                    </p>
+                  </div>
+                  <div className="mt-4 text-nfsu-gold font-black text-[10px] uppercase tracking-[0.3em]">Access →</div>
                 </button>
 
-                {/* Lost & Found - Shared by all */}
-                <button onClick={() => setView('lostfound')} className="text-left p-8 bg-white rounded-3xl border-2 border-slate-100 hover:border-nfsu-navy transition-all group shadow-sm">
-                  <h3 className="font-black text-nfsu-navy mb-3 text-lg uppercase italic">Lost & Found</h3>
-                  <p className="text-xs text-slate-500 font-bold leading-relaxed">Trace and recover items via identity-bound claims.</p>
+                <button onClick={() => setView('lostfound')} className="text-left p-8 bg-nfsu-paper rounded-[2.5rem] border-2 border-transparent hover:border-nfsu-maroon hover:bg-white transition-all group shadow-sm flex flex-col justify-between h-full min-h-[220px]">
+                  <div>
+                     <div className="w-12 h-12 bg-white rounded-xl shadow-inner flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">🔍</div>
+                    <h3 className="font-black text-nfsu-navy mb-3 text-lg uppercase italic group-hover:text-nfsu-maroon transition-colors">Lost & Found</h3>
+                    <p className="text-[10px] text-slate-500 font-black uppercase tracking-tight leading-relaxed opacity-80">Trace and recover identity-bound assets within campus.</p>
+                  </div>
+                  <div className="mt-4 text-nfsu-gold font-black text-[10px] uppercase tracking-[0.3em]">Access →</div>
                 </button>
 
-                {/* Opportunity - Hidden for Staff */}
                 {user.role !== 'staff' && (
-                  <button onClick={() => setView('opportunity')} className="text-left p-8 bg-white rounded-3xl border-2 border-slate-100 hover:border-nfsu-navy transition-all group shadow-sm">
-                    <h3 className="font-black text-nfsu-navy mb-3 text-lg uppercase italic">Opportunity</h3>
-                    <p className="text-xs text-slate-500 font-bold leading-relaxed">Verified pathways for internships and skill growth.</p>
+                  <button onClick={() => setView('opportunity')} className="text-left p-8 bg-nfsu-paper rounded-[2.5rem] border-2 border-transparent hover:border-nfsu-navy hover:bg-white transition-all group shadow-sm flex flex-col justify-between h-full min-h-[220px]">
+                    <div>
+                      <div className="w-12 h-12 bg-white rounded-xl shadow-inner flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">💼</div>
+                      <h3 className="font-black text-nfsu-navy mb-3 text-lg uppercase italic group-hover:text-nfsu-maroon transition-colors">Career Window</h3>
+                      <p className="text-[10px] text-slate-500 font-black uppercase tracking-tight leading-relaxed opacity-80">Verified professional pathways and skill growth.</p>
+                    </div>
+                    <div className="mt-4 text-nfsu-gold font-black text-[10px] uppercase tracking-[0.3em]">Access →</div>
                   </button>
                 )}
 
-                {/* Resource Share - Hidden for Staff */}
                 {user.role !== 'staff' && (
-                  <button onClick={() => setView('resources')} className="text-left p-8 bg-white rounded-3xl border-2 border-slate-100 hover:border-nfsu-navy transition-all group shadow-sm">
-                    <h3 className="font-black text-nfsu-navy mb-3 text-lg uppercase italic">Resource Share</h3>
-                    <p className="text-xs text-slate-500 font-bold leading-relaxed">Repository for papers and peer academic exchange.</p>
+                  <button onClick={() => setView('resources')} className="text-left p-8 bg-nfsu-paper rounded-[2.5rem] border-2 border-transparent hover:border-nfsu-maroon hover:bg-white transition-all group shadow-sm flex flex-col justify-between h-full min-h-[220px]">
+                    <div>
+                      <div className="w-12 h-12 bg-white rounded-xl shadow-inner flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">📚</div>
+                      <h3 className="font-black text-nfsu-navy mb-3 text-lg uppercase italic group-hover:text-nfsu-maroon transition-colors">Skill Share</h3>
+                      <p className="text-[10px] text-slate-500 font-black uppercase tracking-tight leading-relaxed opacity-80">Academic repository and peer mentorship bank.</p>
+                    </div>
+                    <div className="mt-4 text-nfsu-gold font-black text-[10px] uppercase tracking-[0.3em]">Access →</div>
                   </button>
                 )}
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <div className="bg-white p-8 rounded-[2rem] shadow-xl border-2 border-nfsu-gold/20 flex items-center gap-8">
-                <div className="w-24 h-24 bg-nfsu-lightgold rounded-full flex items-center justify-center border-4 border-white shadow-inner">
-                  <span className="text-nfsu-navy font-black text-2xl italic">ID</span>
+            {/* Verification Banner */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              <div className="bg-white p-10 rounded-[3rem] shadow-xl border-2 border-nfsu-gold/30 flex items-center gap-8 group hover:scale-[1.02] transition-all">
+                <div className="w-24 h-24 bg-nfsu-navy rounded-[2rem] flex items-center justify-center border-4 border-nfsu-gold shadow-2xl group-hover:rotate-12 transition-transform">
+                  <span className="text-white font-black text-3xl italic">ID</span>
                 </div>
                 <div>
-                  <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Institutional ID</div>
-                  <div className="font-mono text-3xl font-black text-nfsu-navy tracking-widest">{user.id}</div>
-                  <div className="mt-3 inline-flex items-center gap-1.5 px-3 py-1 bg-nfsu-navy text-white text-[10px] font-black rounded uppercase">VERIFIED ENTITY</div>
+                  <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Entity Reference</div>
+                  <div className="font-mono text-3xl font-black text-nfsu-navy tracking-tighter">{user.id}</div>
+                  <div className="mt-3 inline-flex items-center gap-1.5 px-3 py-1 bg-nfsu-gold text-nfsu-navy text-[10px] font-black rounded uppercase border border-nfsu-navy/10">VERIFIED ASSET</div>
                 </div>
               </div>
-              <div className="bg-nfsu-maroon p-8 rounded-[2rem] shadow-xl text-white flex flex-col justify-center border-b-8 border-black/20">
-                <h4 className="text-xl font-black italic uppercase tracking-tighter mb-2">NFSU Community Database</h4>
-                <p className="text-nfsu-lightgold/70 text-xs font-bold leading-relaxed">This portal acts as the centralized authority for student welfare and academic transparency.</p>
+              
+              <div className="lg:col-span-2 bg-nfsu-navy p-10 rounded-[3rem] shadow-2xl text-white flex flex-col justify-center border-b-8 border-nfsu-gold relative overflow-hidden">
+                <div className="absolute inset-0 bg-institutional-pattern opacity-5"></div>
+                <div className="relative z-10">
+                  <h4 className="text-2xl font-black italic uppercase tracking-tighter mb-4">NFSU Institutional Accountability</h4>
+                  <p className="text-nfsu-gold/60 text-xs font-bold leading-relaxed uppercase tracking-[0.05em]">
+                    This unified portal acts as the single source of truth for student governance. 
+                    Integrity is our mandate. All interactions are identity-bound.
+                  </p>
+                </div>
               </div>
             </div>
           </div>
@@ -123,13 +149,13 @@ export const Dashboard: React.FC<DashboardProps> = ({ user, onLogout, onUpdateUs
   };
 
   return (
-    <div className="w-full h-full flex flex-col items-center">
+    <div className="w-full h-full flex flex-col items-center max-w-7xl mx-auto">
       {view !== 'home' && (
-        <button onClick={() => setView('home')} className="mb-8 flex items-center gap-3 text-nfsu-navy font-black transition-all self-start uppercase text-xs tracking-widest group">
-          <div className="p-2 rounded-xl bg-white border-2 border-slate-200 group-hover:border-nfsu-maroon transition-all shadow-sm">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clipRule="evenodd" /></svg>
+        <button onClick={() => setView('home')} className="mb-8 flex items-center gap-4 text-nfsu-navy font-black transition-all self-start uppercase text-[10px] tracking-[0.3em] group">
+          <div className="p-3 rounded-2xl bg-white border-2 border-nfsu-paper group-hover:border-nfsu-gold transition-all shadow-xl">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-nfsu-gold" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clipRule="evenodd" /></svg>
           </div>
-          Return to Hub
+          Return to Institutional Hub
         </button>
       )}
       {renderContent()}

@@ -70,10 +70,13 @@ export const canteenService = {
     dbService.updateRow<Order>(T_ORDERS, orderId, { items, total });
   },
 
-  updateOrderStatus: (orderId: string, status: OrderStatus) => {
+  updateOrderStatus: (orderId: string, status: OrderStatus, reason?: string) => {
     const updates: Partial<Order> = { status };
     if (status === 'Served') {
       updates.servedTimestamp = Date.now();
+    }
+    if (status === 'Expired' && reason) {
+      updates.declineReason = reason;
     }
     dbService.updateRow<Order>(T_ORDERS, orderId, updates);
   },

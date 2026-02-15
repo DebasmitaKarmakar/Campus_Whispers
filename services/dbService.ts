@@ -9,11 +9,11 @@ export const dbService = {
     // 1. Students Table
     if (!localStorage.getItem(`${DB_PREFIX}students`)) {
       const initialStudents: StudentMaster[] = [
-        { id: 'STU-4000', email: 'stu@gmail.com', enrollment: '4000', fullName: 'Student User', department: 'Cyber Security', role: 'student', status: 'Active', createdAt: Date.now() },
-        { id: 'STU-4001', email: 'test@gmail.com', enrollment: '4001', fullName: 'Test Student', department: 'Digital Forensics', role: 'student', status: 'Active', createdAt: Date.now() },
-        { id: 'ADM-1000', email: 'ad@gmail.com', enrollment: '1000', fullName: 'System Admin', department: 'IT Services', role: 'admin', status: 'Active', createdAt: Date.now() },
-        { id: 'STA-3000', email: 'ct@gmail.com', enrollment: '3000', fullName: 'Canteen Staff', department: 'Canteen Management', role: 'staff', status: 'Active', createdAt: Date.now() },
-        { id: 'STA-3001', email: 'staff@gmail.com', enrollment: '3001', fullName: 'Operational Staff', department: 'Facilities', role: 'staff', status: 'Active', createdAt: Date.now() }
+        { id: 'STU-4000', email: 'stu@gmail.com', institutionalId: '4000', fullName: 'Student User', department: 'Cyber Security', role: 'student', status: 'Active', createdAt: Date.now() },
+        { id: 'STU-4001', email: 'test@gmail.com', institutionalId: '4001', fullName: 'Test Student', department: 'Digital Forensics', role: 'student', status: 'Active', createdAt: Date.now() },
+        { id: 'ADM-1000', email: 'ad@gmail.com', institutionalId: '1000', fullName: 'System Admin', department: 'IT Services', role: 'admin', status: 'Active', createdAt: Date.now() },
+        { id: 'STA-3000', email: 'ct@gmail.com', institutionalId: '3000', fullName: 'Canteen Staff', department: 'Canteen Management', role: 'staff', status: 'Active', createdAt: Date.now() },
+        { id: 'STA-3001', email: 'staff@gmail.com', institutionalId: '3001', fullName: 'Operational Staff', department: 'Facilities', role: 'staff', status: 'Active', createdAt: Date.now() }
       ];
       dbService.saveTable('students', initialStudents);
     }
