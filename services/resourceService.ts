@@ -1,26 +1,43 @@
 
-import { QuestionPaper, HelpRequest, ExamType, HelpCategory, SessionType, HelpRequestStatus } from '../types';
+import { QuestionPaper, HelpRequest, ExamType, HelpCategory, SessionType, HelpRequestStatus, SkillOffer, ResourceCategory } from '../types';
 import { dbService } from './dbService';
 
 const T_PAPERS = 'resources_papers';
 const T_HELP = 'resources_help';
+const T_SKILL_OFFERS = 'resources_skill_offers';
 
 export const resourceService = {
   getPapers: (): QuestionPaper[] => dbService.getTable<QuestionPaper>(T_PAPERS),
 
-  uploadPaper: (user: { id: string, email: string }, data: { year: string, semester: string, examType: ExamType, branch: string, pdfUrl: string }): { success: boolean, message: string } => {
+  uploadResource: (
+    user: { id: string, email: string, fullName: string }, 
+    data: { 
+      year: string, 
+      semester: string, 
+      examType?: ExamType, 
+      subject: string, 
+      branch: string, 
+      pdfUrl: string,
+      resourceType: ResourceCategory
+    }
+  ): { success: boolean, message: string } => {
     const papers = resourceService.getPapers();
     
-    const isDuplicate = papers.some(p => 
-      !p.isArchived &&
-      p.year === data.year && 
-      p.semester === data.semester && 
-      p.examType === data.examType && 
-      p.branch === data.branch
-    );
+    // Check duplication for papers
+    if (data.resourceType === 'Paper') {
+      const isDuplicate = papers.some(p => 
+        !p.isArchived &&
+        p.resourceType === 'Paper' &&
+        p.year === data.year && 
+        p.semester === data.semester && 
+        p.examType === data.examType && 
+        p.branch === data.branch &&
+        p.subject.toLowerCase() === data.subject.toLowerCase()
+      );
 
-    if (isDuplicate) {
-      return { success: false, message: 'Institutional Registry Error: A verified PDF already exists for this session.' };
+      if (isDuplicate) {
+        return { success: false, message: 'Registry Error: A verified paper already exists for this subject/session.' };
+      }
     }
 
     const newPaper: QuestionPaper = {
@@ -29,12 +46,13 @@ export const resourceService = {
       fileHash: data.pdfUrl.substring(0, 32),
       uploaderId: user.id,
       uploaderEmail: user.email,
+      uploaderName: user.fullName,
       createdAt: Date.now(),
       isArchived: false
     };
 
     dbService.addRow(T_PAPERS, newPaper);
-    return { success: true, message: 'Document added to institutional repository.' };
+    return { success: true, message: `${data.resourceType} successfully added to institutional repository.` };
   },
 
   archivePaper: (id: string) => dbService.updateRow<QuestionPaper>(T_PAPERS, id, { isArchived: true }),
@@ -51,6 +69,19 @@ export const resourceService = {
     };
     dbService.addRow(T_HELP, newRequest);
     return newRequest;
+  },
+
+  getSkillOffers: (): SkillOffer[] => dbService.getTable<SkillOffer>(T_SKILL_OFFERS),
+
+  createSkillOffer: (userEmail: string, data: { subject: string, category: HelpCategory, description: string, proficiencyPdfUrl: string }) => {
+    const newOffer: SkillOffer = {
+      id: `EXPERT-${Date.now()}`,
+      expertEmail: userEmail,
+      ...data,
+      createdAt: Date.now()
+    };
+    dbService.addRow(T_SKILL_OFFERS, newOffer);
+    return newOffer;
   },
 
   offerHelp: (requestId: string, userEmail: string, sessionType: SessionType) => {

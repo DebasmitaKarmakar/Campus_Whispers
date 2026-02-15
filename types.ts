@@ -29,7 +29,7 @@ export interface AuthState {
 // --- Canteen Module ---
 
 export type MealType = 'Breakfast' | 'Lunch' | 'Dinner';
-export type OrderStatus = 'Pending' | 'Served' | 'Expired';
+export type OrderStatus = 'Pending' | 'Served' | 'Expired' | 'Cancelled';
 
 export interface MenuItem {
   id: string;
@@ -37,7 +37,7 @@ export interface MenuItem {
   price: number;
   category: MealType;
   available: boolean;
-  createdBy: string; // Admin ID
+  createdBy: string; // Admin or Staff ID
 }
 
 export interface CanteenConfig {
@@ -54,6 +54,8 @@ export interface Order {
   total: number;
   status: OrderStatus;
   timestamp: number;
+  servedTimestamp?: number;
+  cancelReason?: string;
   type: MealType;
   feedbackSubmitted: boolean;
 }
@@ -122,17 +124,21 @@ export interface OpportunityPost {
 
 // --- Resources ---
 
-export type ExamType = 'Mid-Sem' | 'End-Sem' | 'Internal';
+export type ExamType = 'End-Sem' | 'Mid-Sem' | 'CA1' | 'CA2';
+export type ResourceCategory = 'Paper' | 'Notes';
 
 export interface QuestionPaper {
   id: string;
   year: string;
   semester: string;
-  examType: ExamType;
+  examType?: ExamType; // Only for Papers
+  subject: string;
   branch: string;
   pdfUrl: string;
   uploaderId: string;
   uploaderEmail: string;
+  uploaderName: string; // Displayed contributor name
+  resourceType: ResourceCategory;
   fileHash: string;
   createdAt: number;
   isArchived: boolean;
@@ -154,5 +160,15 @@ export interface HelpRequest {
   status: HelpRequestStatus;
   helperEmail?: string;
   helperSessionType?: SessionType;
+  createdAt: number;
+}
+
+export interface SkillOffer {
+  id: string;
+  expertEmail: string;
+  subject: string;
+  category: HelpCategory;
+  description: string;
+  proficiencyPdfUrl: string;
   createdAt: number;
 }

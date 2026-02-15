@@ -73,13 +73,15 @@ export const profileService = {
   },
 
   updateProfile: (userEmail: string, data: { preferredName?: string, profilePhoto?: string }) => {
+    // Standardized Key: profile_data_email
     const key = `profile_data_${userEmail.toLowerCase()}`;
     const existing = JSON.parse(localStorage.getItem(key) || '{}');
     const updated = { ...existing, ...data };
     localStorage.setItem(key, JSON.stringify(updated));
 
+    // Also update current session
     const activeUser = JSON.parse(localStorage.getItem('cw_user') || '{}');
-    if (activeUser.email === userEmail) {
+    if (activeUser.email && activeUser.email.toLowerCase() === userEmail.toLowerCase()) {
       localStorage.setItem('cw_user', JSON.stringify({ ...activeUser, ...data }));
     }
   }

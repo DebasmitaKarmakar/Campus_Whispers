@@ -33,14 +33,14 @@ export const canteenService = {
     return orders.some(o => 
       o.studentEmail === userEmail && 
       o.type === type && 
-      o.status !== 'Expired' &&
+      o.status === 'Pending' &&
       new Date(o.timestamp).toDateString() === today
     );
   },
 
   placeOrder: (studentId: string, userEmail: string, items: { name: string; quantity: number }[], type: MealType): Order => {
     if (canteenService.hasOrderedForSlot(userEmail, type)) {
-      throw new Error(`Duplicate Transaction Blocked: Order for ${type} already exists for today.`);
+      throw new Error(`Slot Restricted: Active order for ${type} already exists.`);
     }
 
     const orderId = `${type.charAt(0)}-${Math.floor(1000 + Math.random() * 9000)}`;
@@ -61,8 +61,21 @@ export const canteenService = {
     return newOrder;
   },
 
+  cancelOrder: (orderId: string, reason: string) => {
+    dbService.updateRow<Order>(T_ORDERS, orderId, { status: 'Cancelled', cancelReason: reason });
+  },
+
+  updateOrderItems: (orderId: string, items: { name: string; quantity: number }[]) => {
+    const total = items.reduce((acc, curr) => acc + (curr.quantity * 50), 0);
+    dbService.updateRow<Order>(T_ORDERS, orderId, { items, total });
+  },
+
   updateOrderStatus: (orderId: string, status: OrderStatus) => {
-    dbService.updateRow<Order>(T_ORDERS, orderId, { status });
+    const updates: Partial<Order> = { status };
+    if (status === 'Served') {
+      updates.servedTimestamp = Date.now();
+    }
+    dbService.updateRow<Order>(T_ORDERS, orderId, updates);
   },
 
   submitFeedback: (feedback: Feedback) => {

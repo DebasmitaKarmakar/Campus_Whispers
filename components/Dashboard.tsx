@@ -22,8 +22,8 @@ export const Dashboard: React.FC<DashboardProps> = ({ user, onLogout, onUpdateUs
   const renderContent = () => {
     switch (view) {
       case 'canteen':
-        if (user.role === 'admin') return <AdminCanteen />;
-        if (user.role === 'staff') return <StaffCanteen />;
+        if (user.role === 'admin') return <AdminCanteen user={user} />;
+        if (user.role === 'staff') return <StaffCanteen user={user} />;
         return <StudentCanteen user={user} />;
       case 'lostfound':
         return <LostFoundDashboard user={user} />;
@@ -67,22 +67,37 @@ export const Dashboard: React.FC<DashboardProps> = ({ user, onLogout, onUpdateUs
               </div>
               
               <div className="p-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                {/* Canteen View - Shared by all but functionality differs */}
                 <button onClick={() => setView('canteen')} className="text-left p-8 bg-white rounded-3xl border-2 border-slate-100 hover:border-nfsu-navy transition-all group shadow-sm">
-                  <h3 className="font-black text-nfsu-navy mb-3 text-lg uppercase italic">{user.role === 'admin' ? 'Canteen Admin' : 'Order Food'}</h3>
-                  <p className="text-xs text-slate-500 font-bold leading-relaxed">{user.role === 'admin' ? 'Configure menu and audit meal windows.' : 'Access standardized university nutrition plan.'}</p>
+                  <h3 className="font-black text-nfsu-navy mb-3 text-lg uppercase italic">
+                    {user.role === 'admin' ? 'Canteen Audit' : user.role === 'staff' ? 'Canteen Service' : 'Order Food'}
+                  </h3>
+                  <p className="text-xs text-slate-500 font-bold leading-relaxed">
+                    {user.role === 'admin' ? 'Strategic menu audit and feedback review.' : user.role === 'staff' ? 'Manage active orders and daily menu registry.' : 'Access standardized university nutrition plan.'}
+                  </p>
                 </button>
+
+                {/* Lost & Found - Shared by all */}
                 <button onClick={() => setView('lostfound')} className="text-left p-8 bg-white rounded-3xl border-2 border-slate-100 hover:border-nfsu-navy transition-all group shadow-sm">
                   <h3 className="font-black text-nfsu-navy mb-3 text-lg uppercase italic">Lost & Found</h3>
                   <p className="text-xs text-slate-500 font-bold leading-relaxed">Trace and recover items via identity-bound claims.</p>
                 </button>
-                <button onClick={() => setView('opportunity')} className="text-left p-8 bg-white rounded-3xl border-2 border-slate-100 hover:border-nfsu-navy transition-all group shadow-sm">
-                  <h3 className="font-black text-nfsu-navy mb-3 text-lg uppercase italic">Opportunity</h3>
-                  <p className="text-xs text-slate-500 font-bold leading-relaxed">Verified pathways for internships and skill growth.</p>
-                </button>
-                <button onClick={() => setView('resources')} className="text-left p-8 bg-white rounded-3xl border-2 border-slate-100 hover:border-nfsu-navy transition-all group shadow-sm">
-                  <h3 className="font-black text-nfsu-navy mb-3 text-lg uppercase italic">Resource Share</h3>
-                  <p className="text-xs text-slate-500 font-bold leading-relaxed">Repository for papers and peer academic exchange.</p>
-                </button>
+
+                {/* Opportunity - Hidden for Staff */}
+                {user.role !== 'staff' && (
+                  <button onClick={() => setView('opportunity')} className="text-left p-8 bg-white rounded-3xl border-2 border-slate-100 hover:border-nfsu-navy transition-all group shadow-sm">
+                    <h3 className="font-black text-nfsu-navy mb-3 text-lg uppercase italic">Opportunity</h3>
+                    <p className="text-xs text-slate-500 font-bold leading-relaxed">Verified pathways for internships and skill growth.</p>
+                  </button>
+                )}
+
+                {/* Resource Share - Hidden for Staff */}
+                {user.role !== 'staff' && (
+                  <button onClick={() => setView('resources')} className="text-left p-8 bg-white rounded-3xl border-2 border-slate-100 hover:border-nfsu-navy transition-all group shadow-sm">
+                    <h3 className="font-black text-nfsu-navy mb-3 text-lg uppercase italic">Resource Share</h3>
+                    <p className="text-xs text-slate-500 font-bold leading-relaxed">Repository for papers and peer academic exchange.</p>
+                  </button>
+                )}
               </div>
             </div>
 
