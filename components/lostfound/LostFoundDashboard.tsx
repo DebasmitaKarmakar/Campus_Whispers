@@ -29,8 +29,6 @@ export const LostFoundDashboard: React.FC<{ user: User }> = ({ user }) => {
     if (activeTab === 'Found') return item.type === 'FoundReport' && item.status !== 'Collected';
     if (activeTab === 'My Posts') return item.reporterEmail === user.email;
     
-    // Fix: Simplified logic as activeTab is guaranteed to be 'All' if it reaches this point.
-    // In the 'All' tab, we only show items that haven't been collected yet.
     return item.status !== 'Collected';
   });
 
@@ -81,7 +79,7 @@ export const LostFoundDashboard: React.FC<{ user: User }> = ({ user }) => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredItems.length === 0 ? (
           <div className="col-span-full py-20 text-center bg-white rounded-3xl border-2 border-dashed border-slate-200">
-            <div className="text-4xl mb-4">🔍</div>
+            <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">Registry Entry Missing</div>
             <p className="text-slate-400 font-medium">No items found matching your filters.</p>
           </div>
         ) : (

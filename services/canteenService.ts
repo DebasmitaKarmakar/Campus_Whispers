@@ -1,10 +1,11 @@
 
-import { MenuItem, Order, MealType, CanteenConfig, OrderStatus, Feedback } from '../types';
+import { MenuItem, Order, MealType, CanteenConfig, OrderStatus, Feedback, GeneralFeedback } from '../types';
 import { dbService } from './dbService';
 
 const T_MENU = 'canteen_menu';
 const T_ORDERS = 'canteen_orders';
 const T_FEEDBACK = 'canteen_feedback';
+const T_GENERAL_FEEDBACK = 'canteen_general_feedback';
 const K_CONFIG = 'canteen_config';
 
 export const canteenService = {
@@ -21,8 +22,14 @@ export const canteenService = {
     };
   },
 
-  saveConfig: (config: Omit<CanteenConfig, 'menu'>) => {
-    localStorage.setItem(K_CONFIG, JSON.stringify(config));
+  // Fix: Updated saveConfig to handle full CanteenConfig including menu persistence
+  // This resolves type errors where menu was being passed to an Omit type
+  saveConfig: (config: CanteenConfig) => {
+    const { menu, ...rest } = config;
+    localStorage.setItem(K_CONFIG, JSON.stringify(rest));
+    if (menu) {
+      dbService.saveTable(T_MENU, menu);
+    }
   },
 
   getOrders: (): Order[] => dbService.getTable<Order>(T_ORDERS),
@@ -33,15 +40,19 @@ export const canteenService = {
     return orders.some(o => 
       o.studentEmail === userEmail && 
       o.type === type && 
-      o.status === 'Pending' &&
+      (o.status === 'Pending' || (o.status === 'Served' && !o.feedbackSubmitted)) &&
       new Date(o.timestamp).toDateString() === today
     );
   },
 
-  placeOrder: (studentId: string, userEmail: string, items: { name: string; quantity: number }[], type: MealType): Order => {
-    if (canteenService.hasOrderedForSlot(userEmail, type)) {
-      throw new Error(`Slot Restricted: Active order for ${type} already exists.`);
-    }
+  placeOrder: (studentId: string, userEmail: string, cartItems: { name: string; quantity: number }[], type: MealType): Order => {
+    const menu = dbService.getTable<MenuItem>(T_MENU);
+    
+    // Calculate total based on current menu prices
+    const total = cartItems.reduce((acc, cartItem) => {
+      const menuItem = menu.find(m => m.name === cartItem.name);
+      return acc + ((menuItem?.price || 0) * cartItem.quantity);
+    }, 0);
 
     const orderId = `${type.charAt(0)}-${Math.floor(1000 + Math.random() * 9000)}`;
     const newOrder: Order = {
@@ -49,8 +60,8 @@ export const canteenService = {
       studentId,
       studentEmail: userEmail,
       studentName: userEmail.split('@')[0],
-      items,
-      total: items.reduce((acc, curr) => acc + (curr.quantity * 50), 0),
+      items: cartItems,
+      total,
       status: 'Pending',
       timestamp: Date.now(),
       type,
@@ -66,7 +77,11 @@ export const canteenService = {
   },
 
   updateOrderItems: (orderId: string, items: { name: string; quantity: number }[]) => {
-    const total = items.reduce((acc, curr) => acc + (curr.quantity * 50), 0);
+    const menu = dbService.getTable<MenuItem>(T_MENU);
+    const total = items.reduce((acc, cartItem) => {
+      const menuItem = menu.find(m => m.name === cartItem.name);
+      return acc + ((menuItem?.price || 0) * cartItem.quantity);
+    }, 0);
     dbService.updateRow<Order>(T_ORDERS, orderId, { items, total });
   },
 
@@ -86,5 +101,16 @@ export const canteenService = {
     dbService.updateRow<Order>(T_ORDERS, feedback.orderId, { feedbackSubmitted: true });
   },
 
-  getAllFeedback: (): Feedback[] => dbService.getTable<Feedback>(T_FEEDBACK)
+  getAllFeedback: (): Feedback[] => dbService.getTable<Feedback>(T_FEEDBACK),
+
+  submitGeneralFeedback: (feedback: Omit<GeneralFeedback, 'id' | 'timestamp'>) => {
+    const newEntry: GeneralFeedback = {
+      ...feedback,
+      id: `GEN-${Date.now()}`,
+      timestamp: Date.now()
+    };
+    dbService.addRow(T_GENERAL_FEEDBACK, newEntry);
+  },
+
+  getAllGeneralFeedback: (): GeneralFeedback[] => dbService.getTable<GeneralFeedback>(T_GENERAL_FEEDBACK)
 };

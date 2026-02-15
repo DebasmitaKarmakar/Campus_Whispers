@@ -50,7 +50,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ user, onLogout, onUpdateUs
                         <span className="text-white font-black text-3xl italic">{user.fullName.charAt(0)}</span>
                       )}
                     </div>
-                    <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-nfsu-gold rounded-full border-4 border-white flex items-center justify-center text-[10px] font-black shadow-lg">✓</div>
+                    <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-nfsu-gold rounded-full border-4 border-white flex items-center justify-center text-[10px] font-black shadow-lg">ID</div>
                   </button>
                   <div>
                     <h2 className="text-4xl font-black text-nfsu-navy tracking-tighter italic uppercase leading-tight mb-1">
@@ -75,7 +75,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ user, onLogout, onUpdateUs
                 {/* Module Cards */}
                 <button onClick={() => setView('canteen')} className="text-left p-8 bg-nfsu-paper rounded-[2.5rem] border-2 border-transparent hover:border-nfsu-navy hover:bg-white transition-all group shadow-sm flex flex-col justify-between h-full min-h-[220px]">
                   <div>
-                    <div className="w-12 h-12 bg-white rounded-xl shadow-inner flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">🍱</div>
+                    <div className="w-12 h-12 bg-white rounded-xl shadow-inner flex items-center justify-center mb-6 group-hover:scale-110 transition-transform text-[10px] font-black text-nfsu-navy uppercase tracking-tighter">MEAL</div>
                     <h3 className="font-black text-nfsu-navy mb-3 text-lg uppercase italic group-hover:text-nfsu-maroon transition-colors">
                       {user.role === 'admin' ? 'Canteen Audit' : user.role === 'staff' ? 'Service Ops' : 'Meal Registry'}
                     </h3>
@@ -88,7 +88,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ user, onLogout, onUpdateUs
 
                 <button onClick={() => setView('lostfound')} className="text-left p-8 bg-nfsu-paper rounded-[2.5rem] border-2 border-transparent hover:border-nfsu-maroon hover:bg-white transition-all group shadow-sm flex flex-col justify-between h-full min-h-[220px]">
                   <div>
-                     <div className="w-12 h-12 bg-white rounded-xl shadow-inner flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">🔍</div>
+                     <div className="w-12 h-12 bg-white rounded-xl shadow-inner flex items-center justify-center mb-6 group-hover:scale-110 transition-transform text-[10px] font-black text-nfsu-navy uppercase tracking-tighter">ITEM</div>
                     <h3 className="font-black text-nfsu-navy mb-3 text-lg uppercase italic group-hover:text-nfsu-maroon transition-colors">Lost & Found</h3>
                     <p className="text-[10px] text-slate-500 font-black uppercase tracking-tight leading-relaxed opacity-80">Trace and recover identity-bound assets within campus.</p>
                   </div>
@@ -98,7 +98,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ user, onLogout, onUpdateUs
                 {user.role !== 'staff' && (
                   <button onClick={() => setView('opportunity')} className="text-left p-8 bg-nfsu-paper rounded-[2.5rem] border-2 border-transparent hover:border-nfsu-navy hover:bg-white transition-all group shadow-sm flex flex-col justify-between h-full min-h-[220px]">
                     <div>
-                      <div className="w-12 h-12 bg-white rounded-xl shadow-inner flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">💼</div>
+                      <div className="w-12 h-12 bg-white rounded-xl shadow-inner flex items-center justify-center mb-6 group-hover:scale-110 transition-transform text-[10px] font-black text-nfsu-navy uppercase tracking-tighter">CAREER</div>
                       <h3 className="font-black text-nfsu-navy mb-3 text-lg uppercase italic group-hover:text-nfsu-maroon transition-colors">Career Window</h3>
                       <p className="text-[10px] text-slate-500 font-black uppercase tracking-tight leading-relaxed opacity-80">Verified professional pathways and skill growth.</p>
                     </div>
@@ -109,7 +109,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ user, onLogout, onUpdateUs
                 {user.role !== 'staff' && (
                   <button onClick={() => setView('resources')} className="text-left p-8 bg-nfsu-paper rounded-[2.5rem] border-2 border-transparent hover:border-nfsu-maroon hover:bg-white transition-all group shadow-sm flex flex-col justify-between h-full min-h-[220px]">
                     <div>
-                      <div className="w-12 h-12 bg-white rounded-xl shadow-inner flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">📚</div>
+                      <div className="w-12 h-12 bg-white rounded-xl shadow-inner flex items-center justify-center mb-6 group-hover:scale-110 transition-transform text-[10px] font-black text-nfsu-navy uppercase tracking-tighter">STUDY</div>
                       <h3 className="font-black text-nfsu-navy mb-3 text-lg uppercase italic group-hover:text-nfsu-maroon transition-colors">Skill Share</h3>
                       <p className="text-[10px] text-slate-500 font-black uppercase tracking-tight leading-relaxed opacity-80">Academic repository and peer mentorship bank.</p>
                     </div>

@@ -2,13 +2,17 @@
 import { StudentMaster, MenuItem, Order, LFItem, OpportunityPost, QuestionPaper, HelpRequest } from '../types';
 
 const DB_PREFIX = 'cw_db_';
+const DB_VERSION = '1.2'; // Incrementing this forces a re-seed
 
 export const dbService = {
-  // Initialize Database with Seed Data
   init: () => {
+    const currentVersion = localStorage.getItem(`${DB_PREFIX}version`);
+    
+    // Force clear and re-seed if version mismatch or empty students table
     const students = dbService.getTable<StudentMaster>('students');
-    // Re-seed if missing OR empty
-    if (students.length === 0) {
+    if (currentVersion !== DB_VERSION || students.length === 0) {
+      console.log('Institutional Database: Syncing Whitelist v' + DB_VERSION);
+      
       const initialStudents: StudentMaster[] = [
         { id: 'STU-4000', email: 'stu@gmail.com', institutionalId: '4000', fullName: 'Student User', department: 'Cyber Security', role: 'student', status: 'Active', createdAt: Date.now() },
         { id: 'STU-4001', email: 'test@gmail.com', institutionalId: '4001', fullName: 'Test Student', department: 'Digital Forensics', role: 'student', status: 'Active', createdAt: Date.now() },
@@ -17,6 +21,7 @@ export const dbService = {
         { id: 'STA-3001', email: 'staff@gmail.com', institutionalId: '3001', fullName: 'Operational Staff', department: 'Facilities', role: 'staff', status: 'Active', createdAt: Date.now() }
       ];
       dbService.saveTable('students', initialStudents);
+      localStorage.setItem(`${DB_PREFIX}version`, DB_VERSION);
     }
 
     const menu = dbService.getTable<MenuItem>('canteen_menu');
@@ -30,25 +35,6 @@ export const dbService = {
         { id: 'MENU-06', name: 'Egg Fried Rice', price: 70, category: 'Dinner', available: true, createdBy: 'ADM-1000' }
       ];
       dbService.saveTable('canteen_menu', initialMenu);
-    }
-
-    const opps = dbService.getTable<OpportunityPost>('opportunities');
-    if (opps.length === 0) {
-      const initialOpps: OpportunityPost[] = [
-        {
-          id: 'OP-1001',
-          title: 'Google Cloud Winter Internship',
-          mode: 'Hybrid',
-          deadline: '2025-12-31',
-          description: '3-month program focusing on infrastructure security.',
-          status: 'Active',
-          posterId: 'ADM-1000',
-          posterEmail: 'ad@gmail.com',
-          posterRole: 'admin',
-          createdAt: Date.now()
-        }
-      ];
-      dbService.saveTable('opportunities', initialOpps);
     }
   },
 
@@ -68,7 +54,7 @@ export const dbService = {
 
   saveTable: <T>(tableName: string, data: T[]) => {
     localStorage.setItem(`${DB_PREFIX}${tableName}`, JSON.stringify(data));
-    // Dispatch custom event for same-tab updates
+    // Dispatch events for real-time reactivity
     window.dispatchEvent(new CustomEvent('cw_db_update', { detail: { table: tableName } }));
   },
 

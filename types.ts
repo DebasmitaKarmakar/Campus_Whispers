@@ -68,6 +68,17 @@ export interface Feedback {
   hygiene: number;
 }
 
+export type GeneralFeedbackCategory = 'Service Speed' | 'Staff Behavior' | 'Pricing' | 'Hygiene' | 'Other';
+
+export interface GeneralFeedback {
+  id: string;
+  category: GeneralFeedbackCategory;
+  comment: string;
+  timestamp: number;
+  isAnonymous: boolean;
+  reporterEmail?: string;
+}
+
 // --- Lost & Found ---
 
 export type LFCategory = 'ID Card' | 'Wallet' | 'Electronics' | 'Documents' | 'Keys' | 'Other';

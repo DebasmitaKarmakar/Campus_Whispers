@@ -130,7 +130,7 @@ export const ResourcesDashboard: React.FC<{ user: User }> = ({ user }) => {
               filteredResources.map(paper => (
                 <div key={paper.id} className="p-8 bg-white rounded-[2rem] border-2 border-slate-100 hover:border-nfsu-navy hover:shadow-2xl transition-all group relative overflow-hidden">
                    <div className="absolute top-0 right-0 w-32 h-32 bg-slate-50 -rotate-12 translate-x-12 -translate-y-12 flex items-center justify-center opacity-40">
-                      <span className="text-4xl">{repoType === 'Paper' ? '📄' : '📓'}</span>
+                      <span className="text-[10px] font-black text-nfsu-navy">{repoType === 'Paper' ? 'DOC' : 'NOTE'}</span>
                    </div>
                   <div className="flex justify-between items-start mb-6">
                     {repoType === 'Paper' ? (
@@ -155,10 +155,10 @@ export const ResourcesDashboard: React.FC<{ user: User }> = ({ user }) => {
                     {user.role === 'admin' && (
                       <button 
                         onClick={() => { resourceService.archivePaper(paper.id); refreshData(); }}
-                        className="px-5 py-4 bg-nfsu-maroon text-white rounded-2xl hover:bg-red-700 transition-colors border-b-4 border-black/20 shadow-xl"
+                        className="px-5 py-4 bg-nfsu-maroon text-white rounded-2xl hover:bg-red-700 transition-colors border-b-4 border-black/20 shadow-xl font-black text-[10px] uppercase"
                         title="Archive"
                       >
-                        🗑️
+                        DEL
                       </button>
                     )}
                   </div>
@@ -272,7 +272,7 @@ export const ResourcesDashboard: React.FC<{ user: User }> = ({ user }) => {
                 skillOffers.map(offer => (
                   <div key={offer.id} className="p-8 bg-white rounded-[2rem] border-2 border-slate-100 flex flex-col hover:border-nfsu-gold hover:shadow-2xl transition-all group relative overflow-hidden">
                     <div className="absolute top-0 right-0 w-24 h-24 bg-nfsu-gold/5 -rotate-12 translate-x-8 -translate-y-8 flex items-center justify-center p-4">
-                       <span className="text-3xl opacity-20">✓</span>
+                       <span className="text-[10px] font-black uppercase text-nfsu-navy opacity-40">CERT</span>
                     </div>
                     <div className="flex justify-between items-start mb-6">
                       <span className={`px-3 py-1 text-[9px] font-black uppercase rounded-lg border-2 ${offer.category === 'Academic' ? 'bg-nfsu-navy text-white border-black/10' : 'bg-nfsu-gold text-nfsu-navy border-white/30'}`}>
@@ -293,7 +293,7 @@ export const ResourcesDashboard: React.FC<{ user: User }> = ({ user }) => {
         </div>
       )}
 
-      {/* --- MODALS - UPDATED FOR RESPONSIVENESS AND NEW FIELDS --- */}
+      {/* --- MODALS --- */}
       {showUploadModal && (
         <RepositoryUploadModal user={user} type={repoType} onClose={() => setShowUploadModal(false)} onCreated={() => { setShowUploadModal(false); refreshData(); }} />
       )}
@@ -307,7 +307,7 @@ export const ResourcesDashboard: React.FC<{ user: User }> = ({ user }) => {
   );
 };
 
-// Modal Components - Overhauled for scrolling and mobile support
+// Modal Components
 const RepositoryUploadModal: React.FC<{ user: User, type: ResourceCategory, onClose: () => void, onCreated: () => void }> = ({ user, type, onClose, onCreated }) => {
   const [formData, setFormData] = useState({ year: '', semester: '', examType: 'Mid-Sem' as ExamType, branch: '', subject: '', pdfUrl: '' });
   const [error, setError] = useState('');

@@ -57,7 +57,7 @@ export const OpportunityCard: React.FC<OpportunityCardProps> = ({ post, isAdmin,
         </h4>
         
         <div className="flex items-center gap-2 text-[10px] font-bold text-slate-400">
-          <span className="w-4 h-4 rounded-full bg-slate-100 flex items-center justify-center">📅</span>
+          <span className="w-auto px-1.5 py-0.5 rounded-md bg-slate-100 flex items-center justify-center text-[8px] font-black">DATE</span>
           DEADLINE: <span className={isExpired ? 'text-red-500' : 'text-indigo-500'}>{new Date(post.deadline).toLocaleDateString()}</span>
         </div>
 
@@ -75,9 +75,9 @@ export const OpportunityCard: React.FC<OpportunityCardProps> = ({ post, isAdmin,
               href={post.documentUrl} 
               target="_blank" 
               rel="noreferrer"
-              className="flex-1 py-2.5 bg-slate-50 text-slate-600 text-[10px] font-bold rounded-xl text-center hover:bg-slate-100 transition-colors border border-slate-100"
+              className="flex-1 py-2.5 bg-slate-50 text-slate-600 text-[10px] font-bold rounded-xl text-center hover:bg-slate-100 transition-colors border border-slate-100 uppercase"
             >
-              📄 View Document
+              DOC View Record
             </a>
           )}
           {post.externalUrl && (
@@ -85,9 +85,9 @@ export const OpportunityCard: React.FC<OpportunityCardProps> = ({ post, isAdmin,
               href={post.externalUrl} 
               target="_blank" 
               rel="noreferrer"
-              className="flex-1 py-2.5 bg-indigo-50 text-indigo-600 text-[10px] font-bold rounded-xl text-center hover:bg-indigo-100 transition-colors border border-indigo-100"
+              className="flex-1 py-2.5 bg-indigo-50 text-indigo-600 text-[10px] font-bold rounded-xl text-center hover:bg-indigo-100 transition-colors border border-indigo-100 uppercase"
             >
-              🔗 Official Link
+              URL Link Access
             </a>
           )}
         </div>

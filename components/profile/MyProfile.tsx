@@ -149,7 +149,7 @@ export const MyProfile: React.FC<MyProfileProps> = ({ user, onProfileUpdate }) =
         <div className="bg-white p-8 rounded-[2rem] shadow-xl border-2 border-slate-100 flex flex-col justify-between group hover:border-nfsu-gold transition-all">
           <div>
             <div className="w-12 h-12 bg-slate-50 rounded-xl flex items-center justify-center mb-6 border border-slate-100">
-               <span className="text-2xl">🍲</span>
+               <span className="text-[10px] font-black uppercase text-nfsu-navy">MEAL</span>
             </div>
             <h4 className="text-sm font-black text-nfsu-navy uppercase tracking-widest mb-6">Canteen Transactions</h4>
             <div className="space-y-4">
@@ -172,7 +172,7 @@ export const MyProfile: React.FC<MyProfileProps> = ({ user, onProfileUpdate }) =
         <div className="bg-white p-8 rounded-[2rem] shadow-xl border-2 border-slate-100 flex flex-col justify-between group hover:border-nfsu-gold transition-all">
           <div>
             <div className="w-12 h-12 bg-slate-50 rounded-xl flex items-center justify-center mb-6 border border-slate-100">
-               <span className="text-2xl">🔍</span>
+               <span className="text-[10px] font-black uppercase text-nfsu-navy">REC</span>
             </div>
             <h4 className="text-sm font-black text-nfsu-navy uppercase tracking-widest mb-6">Recovery Registry</h4>
             <div className="space-y-4">
@@ -195,7 +195,7 @@ export const MyProfile: React.FC<MyProfileProps> = ({ user, onProfileUpdate }) =
         <div className="bg-white p-8 rounded-[2rem] shadow-xl border-2 border-slate-100 flex flex-col justify-between group hover:border-nfsu-gold transition-all">
           <div>
             <div className="w-12 h-12 bg-slate-50 rounded-xl flex items-center justify-center mb-6 border border-slate-100">
-               <span className="text-2xl">💼</span>
+               <span className="text-[10px] font-black uppercase text-nfsu-navy">JOB</span>
             </div>
             <h4 className="text-sm font-black text-nfsu-navy uppercase tracking-widest mb-6">Opportunity Window</h4>
             <div className="space-y-4">
@@ -218,7 +218,7 @@ export const MyProfile: React.FC<MyProfileProps> = ({ user, onProfileUpdate }) =
         <div className="bg-white p-8 rounded-[2rem] shadow-xl border-2 border-slate-100 flex flex-col justify-between group hover:border-nfsu-gold transition-all">
           <div>
             <div className="w-12 h-12 bg-slate-50 rounded-xl flex items-center justify-center mb-6 border border-slate-100">
-               <span className="text-2xl">📚</span>
+               <span className="text-[10px] font-black uppercase text-nfsu-navy">EDU</span>
             </div>
             <h4 className="text-sm font-black text-nfsu-navy uppercase tracking-widest mb-6">Skill Share / Paper Bank</h4>
             <div className="space-y-4">
