@@ -1,8 +1,8 @@
 
-import { StudentMaster, MenuItem, Order, LFItem, OpportunityPost, QuestionPaper, HelpRequest } from '../types';
+import { StudentMaster, MenuItem, Order, LFItem, OpportunityPost, QuestionPaper, HelpRequest, AdminLog } from '../types';
 
 const DB_PREFIX = 'cw_db_';
-const DB_VERSION = '1.2'; // Incrementing this forces a re-seed
+const DB_VERSION = '1.3'; // Incrementing this forces a re-seed
 
 export const dbService = {
   init: () => {
@@ -35,6 +35,11 @@ export const dbService = {
         { id: 'MENU-06', name: 'Egg Fried Rice', price: 70, category: 'Dinner', available: true, createdBy: 'ADM-1000' }
       ];
       dbService.saveTable('canteen_menu', initialMenu);
+    }
+
+    const logs = dbService.getTable<AdminLog>('admin_logs');
+    if (logs.length === 0) {
+      dbService.saveTable('admin_logs', []);
     }
   },
 

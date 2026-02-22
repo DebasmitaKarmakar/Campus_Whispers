@@ -2,6 +2,19 @@
 export type Role = 'student' | 'admin' | 'staff';
 export type AccountStatus = 'Active' | 'Disabled';
 
+// --- Administrative ---
+
+export interface AdminLog {
+  id: string;
+  adminId: string;
+  adminEmail: string;
+  action: string; // e.g., 'ADD_ENTRY', 'TOGGLE_STATUS'
+  targetId: string;
+  targetName: string;
+  timestamp: number;
+  details?: string;
+}
+
 // --- Database Master Tables ---
 
 export interface StudentMaster {
