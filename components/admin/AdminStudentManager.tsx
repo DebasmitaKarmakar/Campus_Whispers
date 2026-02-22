@@ -116,6 +116,7 @@ export const AdminStudentManager: React.FC = () => {
                 <thead>
                   <tr className="border-b-2 border-slate-100">
                     <th className="px-4 pb-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">Entity Metadata</th>
+                    <th className="px-4 pb-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">Role</th>
                     <th className="px-4 pb-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">Department</th>
                     <th className="px-4 pb-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">Security Status</th>
                     <th className="px-4 pb-6 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">Action</th>
@@ -124,7 +125,7 @@ export const AdminStudentManager: React.FC = () => {
                 <tbody className="divide-y divide-slate-50">
                   {filtered.length === 0 ? (
                     <tr>
-                      <td colSpan={4} className="py-20 text-center text-[11px] font-black text-slate-300 uppercase italic tracking-[0.2em]">No registry matches identified</td>
+                      <td colSpan={5} className="py-20 text-center text-[11px] font-black text-slate-300 uppercase italic tracking-[0.2em]">No registry matches identified</td>
                     </tr>
                   ) : filtered.map(s => (
                     <tr key={s.id} className="group hover:bg-slate-50/80 transition-all border-l-4 border-transparent hover:border-nfsu-gold">
@@ -137,10 +138,12 @@ export const AdminStudentManager: React.FC = () => {
                         </div>
                       </td>
                       <td className="p-6">
-                         <div className="flex items-center gap-3">
-                           <span className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-[8px] font-black text-slate-400">{s.role.substring(0, 3).toUpperCase()}</span>
-                           <span className="text-[10px] font-black text-slate-500 uppercase tracking-tight">{s.department}</span>
-                         </div>
+                        <span className={`px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-widest border-2 ${s.role === 'admin' ? 'bg-nfsu-navy/10 text-nfsu-navy border-nfsu-navy/20' : s.role === 'staff' ? 'bg-nfsu-gold/10 text-amber-700 border-amber-200' : 'bg-blue-50 text-blue-700 border-blue-200'}`}>
+                          {s.role}
+                        </span>
+                      </td>
+                      <td className="p-6">
+                        <span className="text-[10px] font-black text-slate-600 uppercase tracking-tight">{s.department}</span>
                       </td>
                       <td className="p-6">
                         <span className={`px-4 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-widest border-2 shadow-sm ${s.status === 'Active' ? 'bg-green-50 text-green-700 border-green-200' : 'bg-red-50 text-red-700 border-red-200'}`}>
