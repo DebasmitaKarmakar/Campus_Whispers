@@ -269,7 +269,11 @@ export const StudentCanteen: React.FC<{ user: User }> = ({ user }) => {
             <div className="pt-6 border-t border-white/20 mb-10 flex justify-between items-end">
                <span className="text-[10px] font-black uppercase opacity-60">AGGREGATE TOTAL</span>
                <span className="text-3xl font-black italic text-nfsu-gold">
-                 INR {Object.entries(cart).reduce((acc, [name, qty]) => acc + (qty * (config.menu.find(m => m.name === name)?.price || 0)), 0)}
+                 INR {Object.entries(cart as Record<string, number>).reduce(
+                  (acc, [name, qty]) =>
+                    acc + qty * (config.menu.find(m => m.name === name)?.price ?? 0),
+                  0
+                )}
                </span>
             </div>
             <button onClick={handleOrder} className="w-full py-6 bg-white text-nfsu-maroon rounded-2xl font-black text-xs uppercase tracking-[0.3em] hover:bg-nfsu-gold transition-all border-b-4 border-slate-200">Submit Verification</button>
