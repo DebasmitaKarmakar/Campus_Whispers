@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { authenticateUser } from '../services/authService';
 import { dbService } from '../services/dbService';
 import { User } from '../types';
-import { Images } from '../src/assets/images';
+import { Images } from '@/src/assets/images';
 
 interface LoginProps {
   onLoginSuccess: (user: User) => void;

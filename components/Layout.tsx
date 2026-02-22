@@ -1,21 +1,40 @@
-import React from 'react';
-import { useDarkMode } from '../hooks/useDarkMode';
-
+import React, { useState, useEffect } from 'react';
 import { Images } from '../src/assets/images';
-const { isDark, toggle } = useDarkMode();
+
+// Dark mode logic lives here, not in a separate hook file
+const getInitialDark = () => localStorage.getItem('cw_theme') === 'dark';
+
 interface LayoutProps {
   children: React.ReactNode;
 }
 
 export const Layout: React.FC<LayoutProps> = ({ children }) => {
+  const [isDark, setIsDark] = useState<boolean>(getInitialDark);
+
+  useEffect(() => {
+    const root = document.documentElement;
+    if (isDark) {
+      root.classList.add('dark');
+      localStorage.setItem('cw_theme', 'dark');
+    } else {
+      root.classList.remove('dark');
+      localStorage.setItem('cw_theme', 'light');
+    }
+  }, [isDark]);
+
+  const toggle = () => setIsDark(p => !p);
   return (
     <div className="min-h-screen flex flex-col dark:bg-slate-900 transition-colors duration-300" style={{backgroundColor: isDark ? undefined : '#fde8e8'}}>
         <header className="bg-nfsu-navy py-5 px-8 sticky top-0 z-50 shadow-2xl border-b-[6px] border-nfsu-gold">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-6">
-            <div className="w-12 h-12 bg-white rounded-lg flex items-center justify-center p-1 border-2 border-nfsu-gold shadow-[0_0_15px_rgba(197,173,88,0.3)] transform hover:scale-105 transition-all">
-               <img src={Images.nfsuLogo} alt="NFSU Logo" className="w-full h-full object-contain" />
-            </div>
+          <div className="w-14 h-14 rounded-xl bg-white flex items-center justify-center p-1 border-2 border-nfsu-gold shadow-[0_0_15px_rgba(197,173,88,0.3)]">
+            <img
+              src={Images.nfsuLogo}
+              alt="logo"
+              className="w-full h-full object-contain"
+            />
+          </div>
             <div>
               <h1 className="text-2xl font-black tracking-tight text-white leading-none uppercase flex items-baseline">
                 CAMPUS<span className="text-nfsu-gold">WHISPERS</span>
@@ -50,7 +69,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
       <main className="flex-1 flex flex-col items-center justify-center p-6 lg:p-12 relative z-10">
         {children}
       </main>
-      <footer style={{backgroundColor: isDark ? undefined : '#fffde7'}} className="... dark:bg-slate-800 dark:border-nfsu-gold/30">
+      <footer style={{backgroundColor: isDark ? undefined : '#fffde7'}} className="py-10 px-8 border-t-4 border-nfsu-gold dark:bg-slate-800 dark:border-nfsu-gold/30">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
           <div className="text-[10px] font-black text-nfsu-navy uppercase tracking-[0.3em]">
             &copy; {new Date().getFullYear()} CampusWhispers • Institutional Authority • NFSU

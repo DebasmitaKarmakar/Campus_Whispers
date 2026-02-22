@@ -1,4 +1,4 @@
-import nfsuLogo from 'assets/images/nfsu-logo.png';
+import nfsuLogo from "./nfsu-logo.png";
 
 export const Images = {
   nfsuLogo,

@@ -1,11 +1,11 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 
 export const useDarkMode = () => {
-  const [isDark, setIsDark] = useState(() => {
+  const [isDark, setIsDark] = React.useState<boolean>(() => {
     return localStorage.getItem('cw_theme') === 'dark';
   });
 
-  useEffect(() => {
+  React.useEffect(() => {
     const root = document.documentElement;
     if (isDark) {
       root.classList.add('dark');
@@ -16,5 +16,5 @@ export const useDarkMode = () => {
     }
   }, [isDark]);
 
-  return { isDark, toggle: () => setIsDark(p => !p) };
+  return { isDark, toggle: () => setIsDark((p: boolean) => !p) };
 };
