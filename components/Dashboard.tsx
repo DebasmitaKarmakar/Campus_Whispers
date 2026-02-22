@@ -85,37 +85,37 @@ export const Dashboard: React.FC<DashboardProps> = ({ user, onLogout, onUpdateUs
     const activities = ROLE_ACTIVITIES[user.role] || ROLE_ACTIVITIES.student;
     const roleLabel = user.role === 'admin' ? 'Administrative' : user.role === 'staff' ? 'Canteen Staff' : 'Student';
     return (
-      <div className="w-full max-w-6xl space-y-10 animate-fadeIn">
-        <div className="bg-white rounded-[3rem] shadow-2xl border-2 border-nfsu-gold/20 overflow-hidden">
-          <div className="p-8 lg:p-12 border-b-2 border-nfsu-paper flex flex-col md:flex-row md:items-center justify-between gap-8 bg-gradient-to-br from-nfsu-paper to-white">
-            <div className="flex items-center gap-8">
-              <button onClick={() => setView('profile')} className="group relative">
-                <div className="w-24 h-24 bg-nfsu-navy rounded-[2rem] flex items-center justify-center p-1.5 border-4 border-nfsu-gold shadow-2xl overflow-hidden transform group-hover:rotate-6 transition-transform">
+      <div className="w-full max-w-6xl space-y-6 md:space-y-10 animate-fadeIn">
+        <div className="bg-white rounded-[2rem] md:rounded-[3rem] shadow-2xl border-2 border-nfsu-gold/20 overflow-hidden">
+          <div className="p-5 md:p-8 lg:p-12 border-b-2 border-nfsu-paper flex flex-col md:flex-row md:items-center justify-between gap-5 md:gap-8 bg-gradient-to-br from-nfsu-paper to-white">
+            <div className="flex items-center gap-4 md:gap-8">
+              <button onClick={() => setView('profile')} className="group relative flex-shrink-0">
+                <div className="w-16 h-16 md:w-24 md:h-24 bg-nfsu-navy rounded-[1.5rem] md:rounded-[2rem] flex items-center justify-center p-1.5 border-4 border-nfsu-gold shadow-2xl overflow-hidden transform group-hover:rotate-6 transition-transform">
                   {user.profilePhoto ? (
-                    <img src={user.profilePhoto} className="w-full h-full object-cover rounded-[1.5rem]" alt="Profile" />
+                    <img src={user.profilePhoto} className="w-full h-full object-cover rounded-[1rem] md:rounded-[1.5rem]" alt="Profile" />
                   ) : (
-                    <span className="text-white font-black text-3xl italic">{user.fullName.charAt(0)}</span>
+                    <span className="text-white font-black text-2xl md:text-3xl italic">{user.fullName.charAt(0)}</span>
                   )}
                 </div>
-                <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-nfsu-gold rounded-full border-4 border-white flex items-center justify-center text-[10px] font-black shadow-lg">ID</div>
+                <div className="absolute -bottom-2 -right-2 w-7 h-7 md:w-8 md:h-8 bg-nfsu-gold rounded-full border-4 border-white flex items-center justify-center text-[9px] font-black shadow-lg">ID</div>
               </button>
-              <div>
-                <h2 className="text-4xl font-black text-nfsu-navy tracking-tighter italic uppercase leading-tight mb-1">
+              <div className="min-w-0">
+                <h2 className="text-2xl md:text-4xl font-black text-nfsu-navy tracking-tighter italic uppercase leading-tight mb-1 break-words">
                   {user.preferredName || user.fullName.split(' ')[0]}'s <span className="text-nfsu-gold">Dashboard</span>
                 </h2>
-                <div className="flex flex-wrap gap-3 items-center mt-2">
-                  <span className="px-3 py-1 bg-nfsu-maroon text-white text-[9px] font-black rounded uppercase tracking-widest">{user.role}</span>
-                  <span className="px-3 py-1 bg-nfsu-navy/10 text-nfsu-navy text-[9px] font-black rounded uppercase tracking-widest">{user.department}</span>
+                <div className="flex flex-wrap gap-2 md:gap-3 items-center mt-2">
+                  <span className="px-2 md:px-3 py-1 bg-nfsu-maroon text-white text-[9px] font-black rounded uppercase tracking-widest">{user.role}</span>
+                  <span className="px-2 md:px-3 py-1 bg-nfsu-navy/10 text-nfsu-navy text-[9px] font-black rounded uppercase tracking-widest">{user.department}</span>
                   <span className="text-slate-400 font-black text-[10px] uppercase tracking-widest">{user.id}</span>
                 </div>
               </div>
             </div>
             <div className="flex flex-wrap gap-3">
-              <button onClick={onLogout} className="px-6 py-4 bg-white border-2 border-slate-200 text-slate-400 font-black rounded-2xl uppercase text-[10px] tracking-widest hover:border-nfsu-maroon hover:text-nfsu-maroon transition-all">Exit Portal</button>
+              <button onClick={onLogout} className="px-4 md:px-6 py-3 md:py-4 bg-white border-2 border-slate-200 text-slate-400 font-black rounded-2xl uppercase text-[10px] tracking-widest hover:border-nfsu-maroon hover:text-nfsu-maroon transition-all">Exit Portal</button>
             </div>
           </div>
 
-          <div className="p-8 lg:p-12">
+          <div className="p-5 md:p-8 lg:p-12">
             <div className="text-[10px] font-black text-slate-400 uppercase tracking-[0.4em] mb-8 flex items-center gap-4">
               <span>{roleLabel} Activities</span>
               <div className="flex-1 h-[1px] bg-slate-100"></div>
@@ -126,7 +126,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ user, onLogout, onUpdateUs
                 <button
                   key={act.id}
                   onClick={() => setView(act.id as ViewType)}
-                  className={`text-left p-8 bg-nfsu-paper rounded-[2rem] border-2 border-transparent ${CARD_ACCENTS[i % CARD_ACCENTS.length]} hover:bg-white transition-all group shadow-sm flex flex-col justify-between min-h-[180px]`}
+                  className={`text-left p-5 md:p-8 bg-nfsu-paper rounded-[1.5rem] md:rounded-[2rem] border-2 border-transparent ${CARD_ACCENTS[i % CARD_ACCENTS.length]} hover:bg-white transition-all group shadow-sm flex flex-col justify-between min-h-[150px] md:min-h-[180px]`}
                 >
                   <div>
                     <div className="w-14 h-8 bg-white rounded-lg shadow-inner flex items-center justify-center mb-5 group-hover:scale-110 transition-transform text-[9px] font-black text-nfsu-navy uppercase tracking-tighter">
@@ -147,18 +147,18 @@ export const Dashboard: React.FC<DashboardProps> = ({ user, onLogout, onUpdateUs
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          <div className="bg-white p-10 rounded-[3rem] shadow-xl border-2 border-nfsu-gold/30 flex items-center gap-8 group hover:scale-[1.02] transition-all">
-            <div className="w-24 h-24 bg-nfsu-navy rounded-[2rem] flex items-center justify-center border-4 border-nfsu-gold shadow-2xl group-hover:rotate-12 transition-transform">
-              <span className="text-white font-black text-3xl italic">ID</span>
+          <div className="bg-white p-6 md:p-10 rounded-[2rem] md:rounded-[3rem] shadow-xl border-2 border-nfsu-gold/30 flex items-center gap-5 md:gap-8 group hover:scale-[1.02] transition-all">
+            <div className="w-16 h-16 md:w-24 md:h-24 bg-nfsu-navy rounded-[1.5rem] md:rounded-[2rem] flex items-center justify-center border-4 border-nfsu-gold shadow-2xl group-hover:rotate-12 transition-transform flex-shrink-0">
+              <span className="text-white font-black text-2xl md:text-3xl italic">ID</span>
             </div>
-            <div>
+            <div className="min-w-0">
               <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Entity Reference</div>
-              <div className="font-mono text-3xl font-black text-nfsu-navy tracking-tighter">{user.id}</div>
+              <div className="font-mono text-2xl md:text-3xl font-black text-nfsu-navy tracking-tighter break-all">{user.id}</div>
               <div className="mt-3 inline-flex items-center gap-1.5 px-3 py-1 bg-nfsu-gold text-nfsu-navy text-[10px] font-black rounded uppercase border border-nfsu-navy/10">VERIFIED ASSET</div>
             </div>
           </div>
           
-          <div className="lg:col-span-2 bg-nfsu-navy p-10 rounded-[3rem] shadow-2xl text-white flex flex-col justify-center border-b-8 border-nfsu-gold relative overflow-hidden">
+          <div className="lg:col-span-2 bg-nfsu-navy p-6 md:p-10 rounded-[2rem] md:rounded-[3rem] shadow-2xl text-white flex flex-col justify-center border-b-8 border-nfsu-gold relative overflow-hidden">
             <div className="absolute inset-0 bg-institutional-pattern opacity-5"></div>
             <div className="relative z-10">
               <h4 className="text-2xl font-black italic uppercase tracking-tighter mb-4">NFSU Institutional Accountability</h4>

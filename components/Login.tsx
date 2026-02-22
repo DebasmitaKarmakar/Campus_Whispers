@@ -61,8 +61,8 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
   };
 
   return (
-    <div className="w-full max-w-2xl px-4 py-12 flex flex-col items-center">
-      <div className="w-full bg-white rounded-[3rem] shadow-[0_35px_60px_-15px_rgba(0,33,71,0.08)] border-2 border-slate-100/50 overflow-hidden relative">
+    <div className="w-full max-w-2xl px-3 py-6 md:px-4 md:py-12 flex flex-col items-center">
+      <div className="w-full bg-white rounded-[2rem] md:rounded-[3rem] shadow-[0_35px_60px_-15px_rgba(0,33,71,0.08)] border-2 border-slate-100/50 overflow-hidden relative">
         <div className="flex h-1.5 w-full">
           <div className="flex-1 bg-nfsu-navy"></div>
           <div className="flex-1 bg-nfsu-gold"></div>
@@ -70,23 +70,23 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2">
-          <div className="bg-nfsu-navy p-12 text-white flex flex-col justify-center items-center text-center relative overflow-hidden">
+          <div className="bg-nfsu-navy p-8 md:p-12 text-white flex flex-col justify-center items-center text-center relative overflow-hidden">
             <div className="absolute inset-0 bg-institutional-pattern opacity-10"></div>
             <div className="relative z-10">
-              <div className="w-24 h-24 bg-white rounded-3xl mx-auto mb-8 flex items-center justify-center p-3 shadow-2xl border-2 border-nfsu-gold/20 transform hover:scale-105 transition-all">
+              <div className="w-16 h-16 md:w-24 md:h-24 bg-white rounded-3xl mx-auto mb-5 md:mb-8 flex items-center justify-center p-3 shadow-2xl border-2 border-nfsu-gold/20 transform hover:scale-105 transition-all">
                <img src={Images.nfsuLogo} alt="NFSU Logo" className="w-full h-full object-contain" />
               </div>
-              <h2 className="text-4xl font-black tracking-tighter uppercase italic leading-none mb-4">
+              <h2 className="text-3xl md:text-4xl font-black tracking-tighter uppercase italic leading-none mb-3 md:mb-4">
                 Campus<br/><span className="text-nfsu-gold">Whispers</span>
               </h2>
-              <div className="w-12 h-1 bg-nfsu-gold mx-auto mb-6"></div>
+              <div className="w-12 h-1 bg-nfsu-gold mx-auto mb-4 md:mb-6"></div>
               <p className="text-nfsu-gold/60 text-[10px] font-black uppercase tracking-[0.4em] leading-relaxed">
                 Central Authority<br/>Authentication Terminal
               </p>
             </div>
           </div>
 
-          <div className="p-10 lg:p-14 bg-white">
+          <div className="p-6 md:p-10 lg:p-14 bg-white">
             <form onSubmit={handleSubmit} className="space-y-8">
               <div className="space-y-6">
                 <div className="group">
