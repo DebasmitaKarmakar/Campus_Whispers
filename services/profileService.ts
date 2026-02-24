@@ -80,9 +80,9 @@ export const profileService = {
     localStorage.setItem(key, JSON.stringify(updated));
 
     // Also update current session
-    const activeUser = JSON.parse(localStorage.getItem('cw_user') || '{}');
+    const activeUser = JSON.parse(localStorage.getItem('cw_session') || '{}');
     if (activeUser.email && activeUser.email.toLowerCase() === userEmail.toLowerCase()) {
-      localStorage.setItem('cw_user', JSON.stringify({ ...activeUser, ...data }));
+      localStorage.setItem('cw_session', JSON.stringify({ ...activeUser, ...data }));
     }
   }
 };

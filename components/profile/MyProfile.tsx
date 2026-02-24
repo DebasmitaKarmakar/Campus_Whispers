@@ -83,7 +83,7 @@ export const MyProfile: React.FC<MyProfileProps> = ({ user, onProfileUpdate }) =
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-lg">
               <div className="bg-white/5 border border-white/10 p-4 rounded-2xl">
                 <div className="text-[10px] font-black text-nfsu-gold/50 uppercase mb-1 tracking-widest">Institutional ID</div>
-                <div className="text-white font-mono font-black tracking-widest">{user.institutionalId}</div>
+                <div className="text-white font-mono font-black tracking-widest">{user.numericId}</div>
               </div>
               <div className="bg-white/5 border border-white/10 p-4 rounded-2xl">
                 <div className="text-[10px] font-black text-nfsu-gold/50 uppercase mb-1 tracking-widest">Account Status</div>

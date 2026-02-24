@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { User } from '../types';
 import { StudentCanteen } from './canteen/StudentCanteen';
@@ -10,7 +11,6 @@ import { MyProfile } from './profile/MyProfile';
 import { AdminStudentManager } from './admin/AdminStudentManager';
 import { GrievanceDashboard } from './grievance/GrievanceDashboard';
 import { CampusDirectory } from './directory/CampusDirectory';
-import { FacultyDashboard } from './faculty/FacultyDashboard';
 
 interface DashboardProps {
   user: User;
@@ -18,58 +18,34 @@ interface DashboardProps {
   onUpdateUser: (user: User) => void;
 }
 
-type ViewType =
-  | 'home'
-  | 'canteen'
-  | 'lostfound'
-  | 'resources'
-  | 'opportunity'
-  | 'profile'
-  | 'students'
-  | 'grievance'
-  | 'directory'
-  | 'faculty_review';
+type ViewType = 'home' | 'canteen' | 'lostfound' | 'resources' | 'opportunity' | 'profile' | 'students' | 'grievance' | 'directory';
 
-interface Activity {
-  id: string;
-  label: string;
-  sub: string;
-  tag: string;
-}
-
-const ROLE_ACTIVITIES: Record<string, Activity[]> = {
+const ROLE_ACTIVITIES: Record<string, Array<{id: string; label: string; sub: string; tag: string}>> = {
   student: [
-    { id: 'directory',   label: 'Campus Directory',    sub: 'Browse all campus clubs, committees, cells, services and library resources.',      tag: 'DIR'   },
-    { id: 'canteen',     label: 'Meal Registry',        sub: 'Browse menu, place orders, track order status, and submit canteen feedback.',      tag: 'MEAL'  },
-    { id: 'lostfound',   label: 'Lost & Found',         sub: 'Report lost items or claim found assets within campus grounds.',                   tag: 'ITEM'  },
-    { id: 'opportunity', label: 'Career Window',        sub: 'Browse internships, placements, hackathons, and skill-building opportunities.',     tag: 'CAREER'},
-    { id: 'resources',   label: 'Skill Share',          sub: 'Access question papers, notes, and request or offer peer mentorship sessions.',     tag: 'STUDY' },
-    { id: 'grievance',   label: 'Grievance Portal',     sub: 'Report campus issues — academic, hostel, infrastructure, fees, and more.',         tag: 'ISSUE' },
-    { id: 'profile',     label: 'Profile Setup',        sub: 'Manage your identity card, profile photo, preferred name, and contact details.',   tag: 'ID'    },
-  ],
-  faculty: [
-    { id: 'faculty_review', label: 'Verification Panel', sub: 'Approve or reject events, coordinator claims, notices, and flagged content.',     tag: 'VERIFY'},
-    { id: 'directory',      label: 'Campus Directory',   sub: 'View the centralized campus organization and service registry.',                   tag: 'DIR'   },
-    { id: 'opportunity',    label: 'Opportunity Review', sub: 'Review and validate student-posted opportunities and career listings.',            tag: 'OPP'   },
-    { id: 'lostfound',      label: 'Lost & Found',       sub: 'Review sensitive lost and found reports requiring institutional oversight.',       tag: 'ITEM'  },
-    { id: 'grievance',      label: 'Grievance View',     sub: 'View grievances relevant to academic and institutional matters.',                  tag: 'ISSUE' },
-    { id: 'profile',        label: 'Profile Setup',      sub: 'Manage your faculty identity card and institutional preferences.',                 tag: 'ID'    },
-  ],
-  canteen: [
-    { id: 'canteen',   label: 'Service Operations', sub: 'Manage active order pipeline, mark orders as served, and update inventory.',        tag: 'OPS'   },
-    { id: 'lostfound', label: 'Lost & Found',       sub: 'Report found items and assist in identity-bound asset recovery on campus.',          tag: 'ITEM'  },
-    { id: 'grievance', label: 'Grievance View',     sub: 'View grievances related to canteen service and campus facilities.',                  tag: 'ISSUE' },
-    { id: 'profile',   label: 'Profile Setup',      sub: 'Manage your staff identity card, contact details, and display preferences.',         tag: 'ID'    },
+    { id: 'canteen', label: 'Meal Registry', sub: 'Browse menu, place orders, track order status, and submit canteen feedback.', tag: 'MEAL' },
+    { id: 'lostfound', label: 'Lost & Found', sub: 'Report lost items or claim found assets within campus grounds.', tag: 'ITEM' },
+    { id: 'opportunity', label: 'Career Window', sub: 'Browse internships, placements, hackathons, and skill-building opportunities.', tag: 'CAREER' },
+    { id: 'resources', label: 'Skill Share', sub: 'Access question papers, notes, and request or offer peer mentorship sessions.', tag: 'STUDY' },
+    { id: 'grievance', label: 'Grievance Portal', sub: 'Report campus issues - academic, hostel, infrastructure, fees, and more.', tag: 'ISSUE' },
+    { id: 'directory', label: 'Campus Directory', sub: 'Browse all campus clubs, committees, academic cells, libraries, and technical bodies.', tag: 'DIR' },
+    { id: 'profile', label: 'Profile Setup', sub: 'Manage your identity card, profile photo, preferred name, and contact details.', tag: 'ID' },
   ],
   admin: [
-    { id: 'directory',   label: 'Campus Directory',    sub: 'View and oversee the centralized campus organization registry.',                   tag: 'DIR'   },
-    { id: 'students',    label: 'Identity Governance', sub: 'Manage whitelist, add or disable accounts, and review full access audit logs.',    tag: 'GOV'   },
-    { id: 'canteen',     label: 'Canteen Audit',       sub: 'Review operational compliance, monitor all orders, and analyze feedback reports.', tag: 'AUDIT' },
-    { id: 'lostfound',   label: 'Lost & Found Control',sub: 'Oversee item reports, manage handovers, and resolve disputed claims.',             tag: 'ITEM'  },
-    { id: 'opportunity', label: 'Opportunity Review',  sub: 'Approve, reject, expire, or directly post verified opportunities for students.',   tag: 'OPP'   },
-    { id: 'resources',   label: 'Resource Oversight',  sub: 'Moderate uploaded academic papers, notes, and skill-share mentorship requests.',  tag: 'STUDY' },
-    { id: 'grievance',   label: 'Grievance Management',sub: 'Review, respond to, categorize, and resolve all student-filed campus grievances.', tag: 'ISSUE' },
-    { id: 'profile',     label: 'Profile Setup',       sub: 'Manage your administrative identity card, photo, and institutional preferences.', tag: 'ID'    },
+    { id: 'students', label: 'Identity Governance', sub: 'Manage whitelist, add or disable accounts, and review full access audit logs.', tag: 'GOV' },
+    { id: 'canteen', label: 'Canteen Audit', sub: 'Review operational compliance, monitor all orders, and analyze feedback reports.', tag: 'AUDIT' },
+    { id: 'lostfound', label: 'Lost & Found Control', sub: 'Oversee item reports, manage handovers, and resolve disputed claims.', tag: 'ITEM' },
+    { id: 'opportunity', label: 'Opportunity Review', sub: 'Approve, reject, expire, or directly post verified opportunities for students.', tag: 'OPP' },
+    { id: 'resources', label: 'Resource Oversight', sub: 'Moderate uploaded academic papers, notes, and skill-share mentorship requests.', tag: 'STUDY' },
+    { id: 'grievance', label: 'Grievance Management', sub: 'Review, respond to, categorize, and resolve all student-filed campus grievances.', tag: 'ISSUE' },
+    { id: 'directory', label: 'Campus Directory', sub: 'Browse and reference all registered campus organizations, cells, and bodies.', tag: 'DIR' },
+    { id: 'profile', label: 'Profile Setup', sub: 'Manage your administrative identity card, photo, and institutional preferences.', tag: 'ID' },
+  ],
+  staff: [
+    { id: 'canteen', label: 'Service Operations', sub: 'Manage active order pipeline, mark orders as served, and update inventory.', tag: 'OPS' },
+    { id: 'lostfound', label: 'Lost & Found', sub: 'Report found items and assist in identity-bound asset recovery on campus.', tag: 'ITEM' },
+    { id: 'grievance', label: 'Grievance View', sub: 'View grievances related to canteen service and campus facilities.', tag: 'ISSUE' },
+    { id: 'directory', label: 'Campus Directory', sub: 'Browse all campus clubs, committees, academic cells, libraries, and technical bodies.', tag: 'DIR' },
+    { id: 'profile', label: 'Profile Setup', sub: 'Manage your staff identity card, contact details, and display preferences.', tag: 'ID' },
   ],
 };
 
@@ -81,15 +57,7 @@ const CARD_ACCENTS = [
   'hover:border-green-500',
   'hover:border-purple-500',
   'hover:border-amber-500',
-  'hover:border-teal-500',
 ];
-
-const ROLE_DISPLAY: Record<string, string> = {
-  admin:   'Administrative',
-  faculty: 'Faculty',
-  canteen: 'Canteen Staff',
-  student: 'Student',
-};
 
 export const Dashboard: React.FC<DashboardProps> = ({ user, onLogout, onUpdateUser }) => {
   const [view, setView] = useState<ViewType>('home');
@@ -98,7 +66,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ user, onLogout, onUpdateUs
     switch (view) {
       case 'canteen':
         if (user.role === 'admin') return <AdminCanteen user={user} />;
-        if (user.role === 'canteen') return <StaffCanteen user={user} />;
+        if (user.role === 'staff') return <StaffCanteen user={user} />;
         return <StudentCanteen user={user} />;
       case 'lostfound':
         return <LostFoundDashboard user={user} />;
@@ -113,18 +81,15 @@ export const Dashboard: React.FC<DashboardProps> = ({ user, onLogout, onUpdateUs
       case 'grievance':
         return <GrievanceDashboard user={user} />;
       case 'directory':
-        return <CampusDirectory user={user} />;
-      case 'faculty_review':
-        return <FacultyDashboard user={user} />;
+        return <CampusDirectory />;
       default:
         return renderHome();
     }
   };
 
   const renderHome = () => {
-    const activities = ROLE_ACTIVITIES[user.role] ?? ROLE_ACTIVITIES.student;
-    const roleLabel = ROLE_DISPLAY[user.role] ?? 'Member';
-
+    const activities = ROLE_ACTIVITIES[user.role] || ROLE_ACTIVITIES.student;
+    const roleLabel = user.role === 'admin' ? 'Administrative' : user.role === 'staff' ? 'Canteen Staff' : 'Student';
     return (
       <div className="w-full max-w-6xl space-y-6 md:space-y-10 animate-fadeIn">
         <div className="bg-white rounded-[2rem] md:rounded-[3rem] shadow-2xl border-2 border-nfsu-gold/20 overflow-hidden">
@@ -142,22 +107,17 @@ export const Dashboard: React.FC<DashboardProps> = ({ user, onLogout, onUpdateUs
               </button>
               <div className="min-w-0">
                 <h2 className="text-2xl md:text-4xl font-black text-nfsu-navy tracking-tighter italic uppercase leading-tight mb-1 break-words">
-                  <span className="text-nfsu-gold">{roleLabel}</span> Dashboard
+                  {user.preferredName || user.fullName.split(' ')[0]}'s <span className="text-nfsu-gold">Dashboard</span>
                 </h2>
                 <div className="flex flex-wrap gap-2 md:gap-3 items-center mt-2">
                   <span className="px-2 md:px-3 py-1 bg-nfsu-maroon text-white text-[9px] font-black rounded uppercase tracking-widest">{user.role}</span>
                   <span className="px-2 md:px-3 py-1 bg-nfsu-navy/10 text-nfsu-navy text-[9px] font-black rounded uppercase tracking-widest">{user.department}</span>
-                  <span className="text-slate-400 font-black text-[10px] uppercase tracking-widest">#{user.numericId}</span>
+                  <span className="text-slate-400 font-black text-[10px] uppercase tracking-widest">{user.id}</span>
                 </div>
               </div>
             </div>
             <div className="flex flex-wrap gap-3">
-              <button
-                onClick={onLogout}
-                className="px-4 md:px-6 py-3 md:py-4 bg-white border-2 border-slate-200 text-slate-400 font-black rounded-2xl uppercase text-[10px] tracking-widest hover:border-nfsu-maroon hover:text-nfsu-maroon transition-all"
-              >
-                Sign Out
-              </button>
+              <button onClick={onLogout} className="px-4 md:px-6 py-3 md:py-4 bg-white border-2 border-slate-200 text-slate-400 font-black rounded-2xl uppercase text-[10px] tracking-widest hover:border-nfsu-maroon hover:text-nfsu-maroon transition-all">Exit Portal</button>
             </div>
           </div>
 
@@ -185,7 +145,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ user, onLogout, onUpdateUs
                       {act.sub}
                     </p>
                   </div>
-                  <div className="mt-4 text-nfsu-gold font-black text-[10px] uppercase tracking-[0.3em]">Access</div>
+                  <div className="mt-4 text-nfsu-gold font-black text-[10px] uppercase tracking-[0.3em]">Access →</div>
                 </button>
               ))}
             </div>
@@ -198,21 +158,19 @@ export const Dashboard: React.FC<DashboardProps> = ({ user, onLogout, onUpdateUs
               <span className="text-white font-black text-2xl md:text-3xl italic">ID</span>
             </div>
             <div className="min-w-0">
-              <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Numeric ID</div>
-              <div className="font-mono text-2xl md:text-3xl font-black text-nfsu-navy tracking-tighter break-all">{user.numericId}</div>
-              <div className="mt-3 inline-flex items-center gap-1.5 px-3 py-1 bg-nfsu-gold text-nfsu-navy text-[10px] font-black rounded uppercase border border-nfsu-navy/10">
-                {user.role.toUpperCase()} VERIFIED
-              </div>
+              <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Entity Reference</div>
+              <div className="font-mono text-2xl md:text-3xl font-black text-nfsu-navy tracking-tighter break-all">{user.id}</div>
+              <div className="mt-3 inline-flex items-center gap-1.5 px-3 py-1 bg-nfsu-gold text-nfsu-navy text-[10px] font-black rounded uppercase border border-nfsu-navy/10">VERIFIED ASSET</div>
             </div>
           </div>
-
+          
           <div className="lg:col-span-2 bg-nfsu-navy p-6 md:p-10 rounded-[2rem] md:rounded-[3rem] shadow-2xl text-white flex flex-col justify-center border-b-8 border-nfsu-gold relative overflow-hidden">
             <div className="absolute inset-0 bg-institutional-pattern opacity-5"></div>
             <div className="relative z-10">
               <h4 className="text-2xl font-black italic uppercase tracking-tighter mb-4">NFSU Institutional Accountability</h4>
               <p className="text-nfsu-gold/60 text-xs font-bold leading-relaxed uppercase tracking-[0.05em]">
-                This unified portal acts as the single source of truth for campus governance.
-                Integrity is the mandate. All interactions are identity-bound.
+                This unified portal acts as the single source of truth for student governance. 
+                Integrity is our mandate. All interactions are identity-bound.
               </p>
             </div>
           </div>
@@ -224,14 +182,9 @@ export const Dashboard: React.FC<DashboardProps> = ({ user, onLogout, onUpdateUs
   return (
     <div className="w-full h-full flex flex-col items-center max-w-7xl mx-auto">
       {view !== 'home' && (
-        <button
-          onClick={() => setView('home')}
-          className="mb-8 flex items-center gap-4 text-nfsu-navy font-black transition-all self-start uppercase text-[10px] tracking-[0.3em] group"
-        >
+        <button onClick={() => setView('home')} className="mb-8 flex items-center gap-4 text-nfsu-navy font-black transition-all self-start uppercase text-[10px] tracking-[0.3em] group">
           <div className="p-3 rounded-2xl bg-white border-2 border-nfsu-paper group-hover:border-nfsu-gold transition-all shadow-xl">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-nfsu-gold" viewBox="0 0 20 20" fill="currentColor">
-              <path fillRule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clipRule="evenodd" />
-            </svg>
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-nfsu-gold" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clipRule="evenodd" /></svg>
           </div>
           Return to Institutional Hub
         </button>

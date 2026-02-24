@@ -1,63 +1,66 @@
-
 import React, { useState, useEffect } from 'react';
 import { Layout } from './components/Layout';
 import { Login } from './components/Login';
 import { Dashboard } from './components/Dashboard';
 import { User, AuthState } from './types';
+import { dbService } from './services/dbService';
+import { revokeDeviceTrust } from './services/authService';
+
+const SESSION_KEY = 'cw_session';
 
 const App: React.FC = () => {
+  useEffect(() => {
+    dbService.init();
+  }, []);
+
   const [authState, setAuthState] = useState<AuthState>(() => {
-    const savedUser = localStorage.getItem('cw_user');
-    if (savedUser) {
-      return {
-        user: JSON.parse(savedUser),
-        isAuthenticated: true
-      };
+    try {
+      const saved = sessionStorage.getItem(SESSION_KEY);
+      if (saved) {
+        return { user: JSON.parse(saved), isAuthenticated: true };
+      }
+    } catch {
+      // corrupted session
     }
-    return {
-      user: null,
-      isAuthenticated: false
-    };
+    return { user: null, isAuthenticated: false };
   });
 
+  // Cross-tab session sync
   useEffect(() => {
-    // Listen for changes from other tabs
     const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === 'cw_user') {
-        if (e.newValue) {
-          setAuthState({ user: JSON.parse(e.newValue), isAuthenticated: true });
-        } else {
-          setAuthState({ user: null, isAuthenticated: false });
-        }
+      if (e.key === SESSION_KEY && !e.newValue) {
+        setAuthState({ user: null, isAuthenticated: false });
       }
     };
-
     window.addEventListener('storage', handleStorageChange);
     return () => window.removeEventListener('storage', handleStorageChange);
   }, []);
 
   const handleLoginSuccess = (user: User) => {
     setAuthState({ user, isAuthenticated: true });
-    localStorage.setItem('cw_user', JSON.stringify(user));
+    sessionStorage.setItem(SESSION_KEY, JSON.stringify(user));
   };
 
   const handleUpdateUser = (updatedUser: User) => {
     setAuthState(prev => ({ ...prev, user: updatedUser }));
-    localStorage.setItem('cw_user', JSON.stringify(updatedUser));
+    sessionStorage.setItem(SESSION_KEY, JSON.stringify(updatedUser));
   };
 
   const handleLogout = () => {
+    if (authState.user) {
+      // Session-only logout: keep device trust intact
+      sessionStorage.removeItem(SESSION_KEY);
+    }
     setAuthState({ user: null, isAuthenticated: false });
-    localStorage.removeItem('cw_user');
   };
 
   return (
     <Layout>
       {authState.isAuthenticated && authState.user ? (
-        <Dashboard 
-          user={authState.user} 
-          onLogout={handleLogout} 
-          onUpdateUser={handleUpdateUser} 
+        <Dashboard
+          user={authState.user}
+          onLogout={handleLogout}
+          onUpdateUser={handleUpdateUser}
         />
       ) : (
         <Login onLoginSuccess={handleLoginSuccess} />

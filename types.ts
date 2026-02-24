@@ -1,6 +1,15 @@
-
-export type Role = 'student' | 'admin' | 'staff';
+export type Role = 'student' | 'admin' | 'faculty' | 'canteen';
 export type AccountStatus = 'Active' | 'Disabled';
+
+// --- Whitelist Entry ---
+
+export interface WhitelistEntry {
+  email: string;
+  role: Role;
+  id: number;
+  fullName: string;
+  department: string;
+}
 
 // --- Administrative ---
 
@@ -8,27 +17,24 @@ export interface AdminLog {
   id: string;
   adminId: string;
   adminEmail: string;
-  action: string; // e.g., 'ADD_ENTRY', 'TOGGLE_STATUS'
+  action: string;
   targetId: string;
   targetName: string;
   timestamp: number;
   details?: string;
 }
 
-// --- Database Master Tables ---
+// --- Auth User ---
 
-export interface StudentMaster {
-  id: string; // Primary Key
+export interface User {
+  id: string;
+  numericId: number;
   email: string;
-  institutionalId: string; // Changed from enrollment for staff/faculty compatibility
   fullName: string;
   department: string;
   role: Role;
   status: AccountStatus;
   createdAt: number;
-}
-
-export interface User extends StudentMaster {
   preferredName?: string;
   profilePhoto?: string;
   lastLogin: number;
@@ -37,6 +43,41 @@ export interface User extends StudentMaster {
 export interface AuthState {
   user: User | null;
   isAuthenticated: boolean;
+}
+
+// --- Device Trust ---
+
+export interface TrustedDevice {
+  deviceId: string;
+  email: string;
+  role: Role;
+  trustedAt: number;
+  expiresAt: number;
+}
+
+// --- Campus Directory ---
+
+export type OrgType = 'club' | 'library' | 'committee' | 'cell' | 'service';
+export type OrgStatus = 'active' | 'inactive';
+
+export interface SocialLinks {
+  instagram?: string;
+  linkedin?: string;
+  twitter?: string;
+  github?: string;
+}
+
+export interface CampusOrg {
+  id: string;
+  name: string;
+  type?: OrgType;
+  description?: string;
+  website?: string;
+  email?: string;
+  logo?: string;
+  socialLinks?: SocialLinks;
+  status?: OrgStatus;
+  facultyAdvisor?: string;
 }
 
 // --- Canteen Module ---
@@ -50,7 +91,7 @@ export interface MenuItem {
   price: number;
   category: MealType;
   available: boolean;
-  createdBy: string; // Admin or Staff ID
+  createdBy: string;
 }
 
 export interface CanteenConfig {
@@ -59,8 +100,8 @@ export interface CanteenConfig {
 }
 
 export interface Order {
-  id: string; 
-  studentId: string; // Foreign Key
+  id: string;
+  studentId: string;
   studentEmail: string;
   studentName: string;
   items: { name: string; quantity: number }[];
@@ -69,7 +110,7 @@ export interface Order {
   timestamp: number;
   servedTimestamp?: number;
   cancelReason?: string;
-  declineReason?: string; // New field for staff decline reasoning
+  declineReason?: string;
   type: MealType;
   feedbackSubmitted: boolean;
 }
@@ -114,7 +155,7 @@ export interface LFItem {
   location: string;
   dateTime: string;
   status: LFStatus;
-  reporterId: string; // FK
+  reporterId: string;
   reporterEmail: string;
   finderId?: string;
   finderEmail?: string;
@@ -141,7 +182,7 @@ export interface OpportunityPost {
   documentUrl?: string;
   externalUrl?: string;
   status: OpportunityStatus;
-  posterId: string; // FK
+  posterId: string;
   posterEmail: string;
   posterRole: Role;
   createdAt: number;
@@ -156,13 +197,13 @@ export interface QuestionPaper {
   id: string;
   year: string;
   semester: string;
-  examType?: ExamType; // Only for Papers
+  examType?: ExamType;
   subject: string;
   branch: string;
   pdfUrl: string;
   uploaderId: string;
   uploaderEmail: string;
-  uploaderName: string; // Displayed contributor name
+  uploaderName: string;
   resourceType: ResourceCategory;
   fileHash: string;
   createdAt: number;
@@ -196,4 +237,21 @@ export interface SkillOffer {
   description: string;
   proficiencyPdfUrl: string;
   createdAt: number;
+}
+
+// --- Faculty Verification ---
+
+export type VerificationStatus = 'Pending' | 'Approved' | 'Rejected';
+
+export interface VerificationRequest {
+  id: string;
+  type: 'event' | 'coordinator' | 'notice' | 'org_detail' | 'flagged_content';
+  targetId: string;
+  targetName: string;
+  requestedBy: string;
+  requestedAt: number;
+  facultyId?: string;
+  status: VerificationStatus;
+  comment?: string;
+  reviewedAt?: number;
 }
