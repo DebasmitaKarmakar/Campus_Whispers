@@ -11,6 +11,8 @@ import { AdminStudentManager } from './admin/AdminStudentManager';
 import { GrievanceDashboard } from './grievance/GrievanceDashboard';
 import { CampusDirectory } from './directory/CampusDirectory';
 import { FacultyDashboard } from './faculty/FacultyDashboard';
+import { NoticeBoard } from './noticeboard/NoticeBoard';
+import { NotificationBell } from './notifications/NotificationBell';
 
 interface DashboardProps {
   user: User;
@@ -28,7 +30,8 @@ type ViewType =
   | 'students'
   | 'grievance'
   | 'directory'
-  | 'faculty_review';
+  | 'faculty_review'
+  | 'noticeboard';
 
 interface Activity {
   id: string;
@@ -39,6 +42,7 @@ interface Activity {
 
 const ROLE_ACTIVITIES: Record<string, Activity[]> = {
   student: [
+    { id: 'noticeboard', label: 'Notice Board',        sub: 'Official notices and announcements from faculty and administration.',                tag: 'NTC'   },
     { id: 'directory',   label: 'Campus Directory',    sub: 'Browse all campus clubs, committees, cells, services and library resources.',      tag: 'DIR'   },
     { id: 'canteen',     label: 'Meal Registry',        sub: 'Browse menu, place orders, track order status, and submit canteen feedback.',      tag: 'MEAL'  },
     { id: 'lostfound',   label: 'Lost & Found',         sub: 'Report lost items or claim found assets within campus grounds.',                   tag: 'ITEM'  },
@@ -48,28 +52,31 @@ const ROLE_ACTIVITIES: Record<string, Activity[]> = {
     { id: 'profile',     label: 'Profile Setup',        sub: 'Manage your identity card, profile photo, preferred name, and contact details.',   tag: 'ID'    },
   ],
   faculty: [
-    { id: 'faculty_review', label: 'Verification Panel', sub: 'Approve or reject events, coordinator claims, notices, and flagged content.',     tag: 'VERIFY'},
-    { id: 'directory',      label: 'Campus Directory',   sub: 'View the centralized campus organization and service registry.',                   tag: 'DIR'   },
-    { id: 'opportunity',    label: 'Opportunity Review', sub: 'Review and validate student-posted opportunities and career listings.',            tag: 'OPP'   },
-    { id: 'lostfound',      label: 'Lost & Found',       sub: 'Review sensitive lost and found reports requiring institutional oversight.',       tag: 'ITEM'  },
-    { id: 'grievance',      label: 'Grievance View',     sub: 'View grievances relevant to academic and institutional matters.',                  tag: 'ISSUE' },
-    { id: 'profile',        label: 'Profile Setup',      sub: 'Manage your faculty identity card and institutional preferences.',                 tag: 'ID'    },
+    { id: 'noticeboard',    label: 'Notice Board',      sub: 'Publish official notices and view all campus announcements.',                       tag: 'NTC'   },
+    { id: 'faculty_review', label: 'Verification Panel',sub: 'Approve or reject events, coordinator claims, notices, and flagged content.',      tag: 'VERIFY'},
+    { id: 'directory',      label: 'Campus Directory',  sub: 'View and manage the centralized campus organization and service registry.',         tag: 'DIR'   },
+    { id: 'opportunity',    label: 'Opportunity Review',sub: 'Review and validate student-posted opportunities and career listings.',             tag: 'OPP'   },
+    { id: 'lostfound',      label: 'Lost & Found',      sub: 'Review sensitive lost and found reports requiring institutional oversight.',        tag: 'ITEM'  },
+    { id: 'grievance',      label: 'Grievance View',    sub: 'View grievances relevant to academic and institutional matters.',                   tag: 'ISSUE' },
+    { id: 'profile',        label: 'Profile Setup',     sub: 'Manage your faculty identity card and institutional preferences.',                  tag: 'ID'    },
   ],
   canteen: [
     { id: 'canteen',   label: 'Service Operations', sub: 'Manage active order pipeline, mark orders as served, and update inventory.',        tag: 'OPS'   },
+    { id: 'noticeboard',label: 'Notice Board',      sub: 'View official campus notices and announcements.',                                    tag: 'NTC'   },
     { id: 'lostfound', label: 'Lost & Found',       sub: 'Report found items and assist in identity-bound asset recovery on campus.',          tag: 'ITEM'  },
     { id: 'grievance', label: 'Grievance View',     sub: 'View grievances related to canteen service and campus facilities.',                  tag: 'ISSUE' },
     { id: 'profile',   label: 'Profile Setup',      sub: 'Manage your staff identity card, contact details, and display preferences.',         tag: 'ID'    },
   ],
   admin: [
-    { id: 'directory',   label: 'Campus Directory',    sub: 'View and oversee the centralized campus organization registry.',                   tag: 'DIR'   },
-    { id: 'students',    label: 'Identity Governance', sub: 'Manage whitelist, add or disable accounts, and review full access audit logs.',    tag: 'GOV'   },
-    { id: 'canteen',     label: 'Canteen Audit',       sub: 'Review operational compliance, monitor all orders, and analyze feedback reports.', tag: 'AUDIT' },
+    { id: 'noticeboard', label: 'Notice Board',       sub: 'Publish official notices and oversee all campus announcements.',                    tag: 'NTC'   },
+    { id: 'directory',   label: 'Campus Directory',   sub: 'View and oversee the centralized campus organization registry.',                    tag: 'DIR'   },
+    { id: 'students',    label: 'Identity Governance',sub: 'Manage whitelist, add or disable accounts, and review full access audit logs.',     tag: 'GOV'   },
+    { id: 'canteen',     label: 'Canteen Audit',      sub: 'Review operational compliance, monitor all orders, and analyze feedback reports.',  tag: 'AUDIT' },
     { id: 'lostfound',   label: 'Lost & Found Control',sub: 'Oversee item reports, manage handovers, and resolve disputed claims.',             tag: 'ITEM'  },
-    { id: 'opportunity', label: 'Opportunity Review',  sub: 'Approve, reject, expire, or directly post verified opportunities for students.',   tag: 'OPP'   },
-    { id: 'resources',   label: 'Resource Oversight',  sub: 'Moderate uploaded academic papers, notes, and skill-share mentorship requests.',  tag: 'STUDY' },
+    { id: 'opportunity', label: 'Opportunity Review', sub: 'Approve, reject, expire, or directly post verified opportunities for students.',    tag: 'OPP'   },
+    { id: 'resources',   label: 'Resource Oversight', sub: 'Moderate uploaded academic papers, notes, and skill-share mentorship requests.',    tag: 'STUDY' },
     { id: 'grievance',   label: 'Grievance Management',sub: 'Review, respond to, categorize, and resolve all student-filed campus grievances.', tag: 'ISSUE' },
-    { id: 'profile',     label: 'Profile Setup',       sub: 'Manage your administrative identity card, photo, and institutional preferences.', tag: 'ID'    },
+    { id: 'profile',     label: 'Profile Setup',      sub: 'Manage your administrative identity card, photo, and institutional preferences.',   tag: 'ID'    },
   ],
 };
 
@@ -116,6 +123,8 @@ export const Dashboard: React.FC<DashboardProps> = ({ user, onLogout, onUpdateUs
         return <CampusDirectory user={user} />;
       case 'faculty_review':
         return <FacultyDashboard user={user} />;
+      case 'noticeboard':
+        return <NoticeBoard user={user} />;
       default:
         return renderHome();
     }
@@ -151,7 +160,8 @@ export const Dashboard: React.FC<DashboardProps> = ({ user, onLogout, onUpdateUs
                 </div>
               </div>
             </div>
-            <div className="flex flex-wrap gap-3">
+            <div className="flex flex-wrap gap-3 items-center">
+              <NotificationBell userEmail={user.email} />
               <button
                 onClick={onLogout}
                 className="px-4 md:px-6 py-3 md:py-4 bg-white border-2 border-slate-200 text-slate-400 font-black rounded-2xl uppercase text-[10px] tracking-widest hover:border-nfsu-maroon hover:text-nfsu-maroon transition-all"

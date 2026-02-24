@@ -89,6 +89,18 @@ export const canteenService = {
     const updates: Partial<Order> = { status };
     if (status === 'Served') {
       updates.servedTimestamp = Date.now();
+      // Notify the student their order is ready
+      const orders = dbService.getTable<Order>(T_ORDERS);
+      const order = orders.find(o => o.id === orderId);
+      if (order) {
+        dbService.pushNotification(
+          order.studentEmail,
+          'food_served',
+          'Your order is ready',
+          `Your ${order.type} order has been served at the canteen.`,
+          orderId
+        );
+      }
     }
     if (status === 'Expired' && reason) {
       updates.declineReason = reason;

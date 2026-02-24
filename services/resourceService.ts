@@ -85,11 +85,23 @@ export const resourceService = {
   },
 
   offerHelp: (requestId: string, userEmail: string, sessionType: SessionType) => {
+    const requests = dbService.getTable<HelpRequest>(T_HELP);
+    const req = requests.find(r => r.id === requestId);
     dbService.updateRow<HelpRequest>(T_HELP, requestId, { 
       status: 'Matched', 
       helperEmail: userEmail, 
       helperSessionType: sessionType 
     });
+    // Notify the person who requested help
+    if (req) {
+      dbService.pushNotification(
+        req.requesterEmail,
+        'skill_help_request',
+        'Someone offered to help you',
+        `A peer has offered to assist you with "${req.topic}". Check the Skill Share section for details.`,
+        requestId
+      );
+    }
   },
 
   withdrawHelp: (requestId: string) => {

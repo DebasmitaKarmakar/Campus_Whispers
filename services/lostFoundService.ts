@@ -39,6 +39,8 @@ export const lostFoundService = {
   },
 
   markAsFound: (id: string, finderEmail: string, data: { foundImage: string, location: string, dateTime: string }) => {
+    const items = lostFoundService.getItems();
+    const item = items.find(i => i.id === id);
     const updates: Partial<LFItem> = {
       status: 'PendingHandover',
       finderEmail,
@@ -48,15 +50,38 @@ export const lostFoundService = {
     };
     lostFoundService.updateStatus(id, updates);
     lostFoundService.addComment(id, finderEmail, `Item reported as found at ${data.location}.`);
+    // Notify original reporter
+    if (item) {
+      dbService.pushNotification(
+        item.reporterEmail,
+        'lostfound_action',
+        'Update on your lost item',
+        `Someone has reported finding your item "${item.title}" at ${data.location}.`,
+        id
+      );
+    }
   },
 
   claimItem: (id: string, claimantEmail: string, proofText: string) => {
+    const items = lostFoundService.getItems();
+    const item = items.find(i => i.id === id);
     const updates: Partial<LFItem> = {
       status: 'PendingHandover',
       claimantEmail
     };
     lostFoundService.updateStatus(id, updates);
     lostFoundService.addComment(id, claimantEmail, `Ownership claim submitted: ${proofText}`);
+    // Notify the finder / reporter
+    if (item) {
+      const notifyEmail = item.finderEmail ?? item.reporterEmail;
+      dbService.pushNotification(
+        notifyEmail,
+        'lostfound_action',
+        'Claim received for your item',
+        `A user has submitted a claim for "${item.title}". Review the comments for details.`,
+        id
+      );
+    }
   },
 
   uploadHandover: (id: string, userEmail: string, proofImage: string) => {

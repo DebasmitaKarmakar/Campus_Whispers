@@ -20,28 +20,16 @@ const TYPE_LABELS: Record<VerificationRequest['type'], string> = {
   flagged_content: 'Flagged Content',
 };
 
-// Seed some demo verification requests
+// Two example verification requests — real data comes from student/faculty actions
 const SEED_REQUESTS: VerificationRequest[] = [
   {
-    id: 'VR-001', type: 'event', targetId: 'EVT-001', targetName: 'Annual Hackathon 2025',
-    requestedBy: 'stu@gmail.com', requestedAt: Date.now() - 86400000 * 2, status: 'Pending',
+    id: 'VR-001', type: 'event', targetId: 'EVT-001', targetName: 'Annual Hackathon — Sample Request',
+    requestedBy: 'student@nfsu.ac.in', requestedAt: Date.now() - 86400000 * 2, status: 'Pending',
   },
   {
-    id: 'VR-002', type: 'coordinator', targetId: 'USR-4000', targetName: 'Student User — Coding Club Lead',
-    requestedBy: 'stu@gmail.com', requestedAt: Date.now() - 86400000 * 1, status: 'Pending',
-  },
-  {
-    id: 'VR-003', type: 'notice', targetId: 'NTC-003', targetName: 'Exam Rescheduling Notice — Nov 2025',
-    requestedBy: 'dbsmita06@gmail.com', requestedAt: Date.now() - 86400000 * 3, status: 'Pending',
-  },
-  {
-    id: 'VR-004', type: 'org_detail', targetId: 'ORG-006', targetName: 'Cyber Forensics Society Description Update',
-    requestedBy: 'stu@gmail.com', requestedAt: Date.now() - 86400000 * 5, status: 'Approved',
+    id: 'VR-002', type: 'org_detail', targetId: 'ORG-001', targetName: 'Coding Club Description Update — Sample',
+    requestedBy: 'student@nfsu.ac.in', requestedAt: Date.now() - 86400000 * 5, status: 'Approved',
     facultyId: '3000', comment: 'Content verified and accurate.', reviewedAt: Date.now() - 86400000 * 4,
-  },
-  {
-    id: 'VR-005', type: 'flagged_content', targetId: 'LF-010', targetName: 'Lost & Found Post — Possible Duplicate',
-    requestedBy: 'ct@gmail.com', requestedAt: Date.now() - 3600000, status: 'Pending',
   },
 ];
 

@@ -239,6 +239,45 @@ export interface SkillOffer {
   createdAt: number;
 }
 
+// --- Notice Board ---
+
+export type NoticeAudience = 'all' | 'student' | 'faculty';
+export type NoticePriority = 'Normal' | 'Important' | 'Urgent';
+
+export interface Notice {
+  id: string;
+  title: string;
+  body: string;
+  publishedBy: string;
+  publisherEmail: string;
+  publisherRole: Role;
+  audience: NoticeAudience;
+  priority: NoticePriority;
+  attachmentUrl?: string;
+  createdAt: number;
+  isArchived: boolean;
+}
+
+// --- Notifications ---
+
+export type NotificationCategory =
+  | 'food_served'
+  | 'new_notice'
+  | 'event_declared'
+  | 'lostfound_action'
+  | 'skill_help_request';
+
+export interface AppNotification {
+  id: string;
+  category: NotificationCategory;
+  title: string;
+  message: string;
+  recipientEmail: string;
+  isRead: boolean;
+  createdAt: number;
+  refId?: string;
+}
+
 // --- Faculty Verification ---
 
 export type VerificationStatus = 'Pending' | 'Approved' | 'Rejected';
