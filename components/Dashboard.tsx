@@ -62,7 +62,6 @@ const ROLE_ACTIVITIES: Record<string, Activity[]> = {
   ],
   canteen: [
     { id: 'canteen',   label: 'Service Operations', sub: 'Manage active order pipeline, mark orders as served, and update inventory.',        tag: 'OPS'   },
-    { id: 'noticeboard',label: 'Notice Board',      sub: 'View official campus notices and announcements.',                                    tag: 'NTC'   },
     { id: 'lostfound', label: 'Lost & Found',       sub: 'Report found items and assist in identity-bound asset recovery on campus.',          tag: 'ITEM'  },
     { id: 'grievance', label: 'Grievance View',     sub: 'View grievances related to canteen service and campus facilities.',                  tag: 'ISSUE' },
     { id: 'profile',   label: 'Profile Setup',      sub: 'Manage your staff identity card, contact details, and display preferences.',         tag: 'ID'    },
@@ -116,7 +115,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ user, onLogout, onUpdateUs
       case 'profile':
         return <MyProfile user={user} onProfileUpdate={onUpdateUser} />;
       case 'students':
-        return <AdminStudentManager />;
+        return <AdminStudentManager user={user} />;
       case 'grievance':
         return <GrievanceDashboard user={user} />;
       case 'directory':

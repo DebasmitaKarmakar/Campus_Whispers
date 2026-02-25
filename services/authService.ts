@@ -2,18 +2,22 @@ import { User, WhitelistEntry, TrustedDevice, Role } from '../types';
 import { sendTOTPEmail, isEmailServiceConfigured } from './emailService';
 
 // ============================================================
-// WHITELIST — Strict email-to-role-to-id mapping
+// WHITELIST — Dynamic, admin-managed whitelist backed by localStorage.
+// Seed entries are written once on first load; admins can add/remove
+// entries at runtime via the Identity Governance panel.
 // Privilege order for conflict resolution: admin > faculty > canteen > student
 // ============================================================
 
-const PRIVILEGE_ORDER: Record<Role, number> = {
+export const PRIVILEGE_ORDER: Record<Role, number> = {
   admin: 4,
   faculty: 3,
   canteen: 2,
   student: 1,
 };
 
-const RAW_WHITELIST: WhitelistEntry[] = [
+const WHITELIST_STORAGE_KEY = 'cw_whitelist';
+
+const SEED_WHITELIST: WhitelistEntry[] = [
   // Students
   { email: 'stu@gmail.com',                          role: 'student', id: 4000, fullName: 'Student User',         department: 'Cyber Security'       },
   { email: 'dbsmita06@gmail.com',                    role: 'student', id: 4001, fullName: 'Debasmita Deb',         department: 'Digital Forensics'    },
@@ -28,14 +32,13 @@ const RAW_WHITELIST: WhitelistEntry[] = [
 
   // Admin
   { email: 'ad@gmail.com',                           role: 'admin',   id: 2000, fullName: 'System Administrator', department: 'IT Services'          },
-  // debasmitak10@gmail.com also admin — highest privilege (admin > faculty) wins
   { email: 'debasmitak10@gmail.com',                 role: 'admin',   id: 2001, fullName: 'Debasmita Karmakar',    department: 'Computer Science'     },
 ];
 
-// Resolve conflicts: if same email has multiple roles, keep highest privilege
-const resolveWhitelist = (): Map<string, WhitelistEntry> => {
+/** Build a Map from an array, keeping highest-privilege entry per email. */
+const buildMap = (entries: WhitelistEntry[]): Map<string, WhitelistEntry> => {
   const map = new Map<string, WhitelistEntry>();
-  for (const entry of RAW_WHITELIST) {
+  for (const entry of entries) {
     const key = entry.email.toLowerCase();
     const existing = map.get(key);
     if (!existing || PRIVILEGE_ORDER[entry.role] > PRIVILEGE_ORDER[existing.role]) {
@@ -45,7 +48,85 @@ const resolveWhitelist = (): Map<string, WhitelistEntry> => {
   return map;
 };
 
-export const WHITELIST = resolveWhitelist();
+/** Load all whitelist entries from localStorage (seeds once if empty). */
+const loadEntries = (): WhitelistEntry[] => {
+  try {
+    const raw = localStorage.getItem(WHITELIST_STORAGE_KEY);
+    if (raw) return JSON.parse(raw) as WhitelistEntry[];
+  } catch { /* ignore */ }
+  // First load — seed with defaults
+  localStorage.setItem(WHITELIST_STORAGE_KEY, JSON.stringify(SEED_WHITELIST));
+  return SEED_WHITELIST;
+};
+
+const saveEntries = (entries: WhitelistEntry[]): void => {
+  localStorage.setItem(WHITELIST_STORAGE_KEY, JSON.stringify(entries));
+  window.dispatchEvent(new CustomEvent('cw_whitelist_update'));
+};
+
+/** Returns the live whitelist Map (re-reads from storage each call). */
+export const getWhitelistMap = (): Map<string, WhitelistEntry> =>
+  buildMap(loadEntries());
+
+/** Backwards-compatible export — snapshot at module load time. */
+export const WHITELIST: Map<string, WhitelistEntry> = buildMap(loadEntries());
+
+// ============================================================
+// ADMIN-ONLY WHITELIST MUTATIONS
+// ============================================================
+
+export interface WhitelistMutationResult {
+  success: boolean;
+  error?: string;
+}
+
+/** Add a new entry (admin-only gate is enforced in the UI layer). */
+export const addWhitelistEntry = (entry: WhitelistEntry): WhitelistMutationResult => {
+  const entries = loadEntries();
+  const key = entry.email.toLowerCase();
+  // Prevent duplicate email+role combos
+  if (entries.some(e => e.email.toLowerCase() === key && e.role === entry.role)) {
+    return { success: false, error: 'This email + role combination already exists.' };
+  }
+  // Auto-assign next ID in role bucket if id === 0
+  let newEntry = { ...entry, email: key };
+  if (!newEntry.id) {
+    const maxId = entries
+      .filter(e => e.role === entry.role)
+      .reduce((m, e) => Math.max(m, e.id), 0);
+    newEntry.id = maxId + 1;
+  }
+  saveEntries([...entries, newEntry]);
+  // Keep module-level WHITELIST in sync
+  WHITELIST.set(key, newEntry);
+  return { success: true };
+};
+
+/** Remove an entry by email + role. */
+export const removeWhitelistEntry = (email: string, role: Role): WhitelistMutationResult => {
+  const key = email.toLowerCase();
+  const entries = loadEntries();
+  const next = entries.filter(e => !(e.email.toLowerCase() === key && e.role === role));
+  if (next.length === entries.length) {
+    return { success: false, error: 'Entry not found.' };
+  }
+  saveEntries(next);
+  // If no remaining entries for this email, remove from map
+  if (!next.some(e => e.email.toLowerCase() === key)) {
+    WHITELIST.delete(key);
+  } else {
+    // Re-resolve highest privilege for this email
+    const remaining = next.filter(e => e.email.toLowerCase() === key);
+    const best = remaining.reduce((a, b) =>
+      PRIVILEGE_ORDER[a.role] >= PRIVILEGE_ORDER[b.role] ? a : b
+    );
+    WHITELIST.set(key, best);
+  }
+  return { success: true };
+};
+
+/** Get live list of all whitelist entries (re-reads storage). */
+export const getWhitelistEntries = (): WhitelistEntry[] => loadEntries();
 
 // ============================================================
 // DEVICE TRUST
@@ -227,7 +308,7 @@ export const simulateGoogleOAuth = async (email: string): Promise<GoogleAuthResu
 // ============================================================
 
 export const lookupWhitelist = (email: string): WhitelistEntry | null =>
-  WHITELIST.get(email.trim().toLowerCase()) ?? null;
+  getWhitelistMap().get(email.trim().toLowerCase()) ?? null;
 
 export const buildUserFromEntry = (entry: WhitelistEntry): User => ({
   id:         String(entry.id),
