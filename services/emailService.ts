@@ -1,7 +1,5 @@
 // emailService.ts
 // Sends TOTP codes via EmailJS (browser SDK — no backend needed).
-//
-
 
 declare const emailjs: {
   init: (config: { publicKey: string }) => void;

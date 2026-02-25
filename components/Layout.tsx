@@ -40,7 +40,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                 CAMPUS<span className="text-nfsu-gold">WHISPERS</span>
                 <span className="ml-2 w-1.5 h-1.5 bg-nfsu-gold rounded-full animate-pulse"></span>
               </h1>
-              <p className="text-[9px] md:text-[10px] text-nfsu-gold/80 font-black uppercase tracking-[0.2em] md:tracking-[0.3em] mt-0.5 md:mt-1.5">Natl. Forensic Sciences Univ.</p>
+              <p className="text-[9px] md:text-[10px] text-nfsu-gold/80 font-black uppercase tracking-[0.2em] md:tracking-[0.3em] mt-0.5 md:mt-1.5">National Forensic Sciences University, Tripura</p>
             </div>
           </div>
           <div className="hidden lg:flex items-center gap-4">
