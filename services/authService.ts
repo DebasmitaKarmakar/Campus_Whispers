@@ -114,23 +114,34 @@ export const revokeDeviceTrust = (email: string): void => {
 };
 
 // ============================================================
-// TOTP — Generated here, sent via EmailJS to the whitelisted email
-// A real deployment should use a TOTP library (e.g. otpauth) server-side.
-// This implementation generates a 6-digit numeric code, stores it in
-// sessionStorage (never exposed in the UI), and sends it to the user's email.
+// TOTP — Generated here, sent via EmailJS to the whitelisted email.
+// SECURITY: The plain-text code is NEVER stored anywhere.
+// Only a salted SHA-256 hash is written to sessionStorage so that
+// even if someone inspects DevTools → Application → Session Storage,
+// they cannot recover the original OTP.
 // ============================================================
 
 const TOTP_PAYLOAD_KEY = 'cw_totp_payload';
 const TOTP_WINDOW_MS   = 5 * 60 * 1000; // 5 minutes
 
+// Only the hash + metadata are persisted — never the raw code
 interface TOTPPayload {
-  code: string;
+  hash: string;        // SHA-256 hex of (code + email.toLowerCase() + salt)
+  salt: string;        // random 16-byte hex salt — unique per OTP
   generatedAt: number;
-  email: string;
+  email: string;       // lower-cased, for binding
 }
 
 const generateCode = (): string =>
   String(Math.floor(100000 + Math.random() * 900000));
+
+/** Compute SHA-256 using the browser's native Web Crypto API */
+const sha256hex = async (message: string): Promise<string> => {
+  const buf  = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(message));
+  return Array.from(new Uint8Array(buf))
+    .map(b => b.toString(16).padStart(2, '0'))
+    .join('');
+};
 
 export interface TOTPSendResult {
   success: boolean;
@@ -140,19 +151,26 @@ export interface TOTPSendResult {
 }
 
 /**
- * Generates a TOTP code and sends it to the whitelisted email.
- * The code is stored in sessionStorage and never shown in the UI.
- * Returns success/failure so the Login component can show appropriate UI.
+ * Generates a TOTP code, hashes it (with a random salt) and stores ONLY the
+ * hash in sessionStorage.  The plain code is sent to the user's email and then
+ * immediately discarded — it is never written to any browser storage.
  */
 export const generateAndSendTOTP = async (email: string): Promise<TOTPSendResult> => {
-  const code = generateCode();
-  const payload: TOTPPayload = { code, generatedAt: Date.now(), email: email.toLowerCase() };
+  const code  = generateCode();
+  const salt  = Array.from(crypto.getRandomValues(new Uint8Array(16)))
+    .map(b => b.toString(16).padStart(2, '0'))
+    .join('');
+  const hash  = await sha256hex(code + email.toLowerCase() + salt);
+
+  const payload: TOTPPayload = {
+    hash,
+    salt,
+    generatedAt: Date.now(),
+    email: email.toLowerCase(),
+  };
   sessionStorage.setItem(TOTP_PAYLOAD_KEY, JSON.stringify(payload));
 
-  // If EmailJS is not yet configured, return a special flag so the Login
-  // component can display a setup instructions banner instead of silently failing.
   if (!isEmailServiceConfigured()) {
-    console.warn('[authService] EmailJS not configured — TOTP code not sent. Configure .env.local to enable email delivery.');
     return { success: false, unconfigured: true };
   }
 
@@ -160,10 +178,11 @@ export const generateAndSendTOTP = async (email: string): Promise<TOTPSendResult
 };
 
 /**
- * Validates user-entered TOTP code against the stored payload.
- * The payload is bound to the email used to generate it as an extra check.
+ * Validates the user-entered code by re-hashing it with the stored salt and
+ * comparing digests — the original code is never read back from storage.
+ * Returns a Promise because SHA-256 is async via Web Crypto.
  */
-export const validateTOTP = (inputCode: string, email: string): boolean => {
+export const validateTOTP = async (inputCode: string, email: string): Promise<boolean> => {
   try {
     const raw = sessionStorage.getItem(TOTP_PAYLOAD_KEY);
     if (!raw) return false;
@@ -172,9 +191,11 @@ export const validateTOTP = (inputCode: string, email: string): boolean => {
 
     if (payload.email !== email.toLowerCase()) return false;
     if (Date.now() - payload.generatedAt > TOTP_WINDOW_MS) return false;
-    if (payload.code !== inputCode.trim()) return false;
 
-    // Consume the code — one-time use
+    const inputHash = await sha256hex(inputCode.trim() + email.toLowerCase() + payload.salt);
+    if (inputHash !== payload.hash) return false;
+
+    // Consume the payload — strictly one-time use
     sessionStorage.removeItem(TOTP_PAYLOAD_KEY);
     return true;
   } catch {

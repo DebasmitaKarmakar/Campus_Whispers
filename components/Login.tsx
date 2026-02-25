@@ -148,11 +148,11 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
   };
 
   // ── Verify entered code ───────────────────────────────────────
-  const submitTOTP = (code: string) => {
+  const submitTOTP = async (code: string) => {
     if (!pendingEntry) return;
     setStep('verifying');
 
-    const valid = validateTOTP(code, pendingEntry.email);
+    const valid = await validateTOTP(code, pendingEntry.email);
 
     if (!valid) {
       const attempts = totpAttempts + 1;
@@ -209,7 +209,7 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
   };
 
   return (
-    <div className="w-full max-w-2xl px-4 py-9 md:px-4 md:py-12 flex flex-col items-center">
+    <div className="w-full max-w-2xl px-3 py-6 md:px-4 md:py-12 flex flex-col items-center">
       <div className="w-full bg-white rounded-[2rem] md:rounded-[3rem] shadow-[0_35px_60px_-15px_rgba(0,33,71,0.08)] border-2 border-slate-100 overflow-hidden">
 
         {/* Top stripe */}
@@ -235,6 +235,21 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
               <p className="text-nfsu-gold/50 text-[9px] font-black uppercase tracking-[0.4em] leading-relaxed mb-8">
                 Secure Institutional<br />Access Gateway
               </p>
+
+              <div className="text-left space-y-3 mt-2">
+                {[
+                  ['Passwordless Login', 'Google Sign-In only'],
+                  ['Email Verification', 'OTP sent to your email'],
+                ].map(([label, desc]) => (
+                  <div key={label} className="flex items-start gap-3">
+                    <div className="w-1.5 h-1.5 rounded-full bg-nfsu-gold mt-[5px] flex-shrink-0"></div>
+                    <div>
+                      <div className="text-[9px] font-black text-white uppercase tracking-widest">{label}</div>
+                      <div className="text-[9px] font-bold text-nfsu-gold/40 uppercase tracking-wider">{desc}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
 

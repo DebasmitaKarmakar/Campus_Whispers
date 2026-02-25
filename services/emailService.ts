@@ -1,5 +1,7 @@
 // emailService.ts
 // Sends TOTP codes via EmailJS (browser SDK — no backend needed).
+//
+
 
 declare const emailjs: {
   init: (config: { publicKey: string }) => void;
@@ -36,13 +38,6 @@ export const sendTOTPEmail = async (
 
     const toName = toEmail.split('@')[0];
 
-    // Log what we're sending so it's easy to debug template mismatches
-    console.log('[emailService] Sending OTP to:', toEmail, '| Params:', {
-      to_email: toEmail,
-      to_name:  toName,
-      otp:      totpCode,
-    });
-
     // Pass publicKey in the send call directly (no separate init needed)
     const response = await emailjsClient.send(
       SERVICE_ID,
@@ -55,28 +50,17 @@ export const sendTOTPEmail = async (
       { publicKey: PUBLIC_KEY }
     );
 
-    console.log('[emailService] Response:', response.status, response.text);
-
     if (response.status === 200) {
       return { success: true };
     }
     return {
       success: false,
-      error: `Status ${response.status}: ${response.text}`,
+      error: 'Email delivery failed. Please try again.',
     };
 
   } catch (err: unknown) {
-    // Stringify properly — EmailJS errors are often objects
-    let message: string;
-    if (err instanceof Error) {
-      message = err.message;
-    } else if (typeof err === 'object' && err !== null) {
-      message = JSON.stringify(err);
-    } else {
-      message = String(err);
-    }
-    console.error('[emailService] Failed to send OTP:', message);
-    return { success: false, error: message };
+    // Return a generic error — never expose internal details to the client
+    return { success: false, error: 'Failed to send verification email. Please try again.' };
   }
 };
 
