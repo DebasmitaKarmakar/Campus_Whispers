@@ -59,6 +59,15 @@ export const StaffCanteen: React.FC<{ user: User }> = ({ user }) => {
     e.preventDefault();
     if (!newItem.name || !newItem.price) return;
 
+    // Prevent duplicate menu item (same name + category)
+    const isDuplicate = config.menu.some(
+      m => m.name.trim().toLowerCase() === newItem.name.trim().toLowerCase() && m.category === newItem.category
+    );
+    if (isDuplicate) {
+      alert(`A menu item named "${newItem.name}" already exists in the ${newItem.category} category. Duplicate entries are not permitted.`);
+      return;
+    }
+
     const item: MenuItem = {
       id: `ITEM-${Date.now()}`,
       name: newItem.name,

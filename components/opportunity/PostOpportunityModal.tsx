@@ -18,6 +18,7 @@ export const PostOpportunityModal: React.FC<PostOpportunityModalProps> = ({ user
     documentUrl: '',
     externalUrl: ''
   });
+  const [submitError, setSubmitError] = useState('');
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -31,8 +32,12 @@ export const PostOpportunityModal: React.FC<PostOpportunityModalProps> = ({ user
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.title || !formData.deadline) return;
-    
-    opportunityService.createPost(user, formData);
+    setSubmitError('');
+    const result = opportunityService.createPost(user, formData);
+    if ('error' in result) {
+      setSubmitError(result.error as string);
+      return;
+    }
     onSuccess();
   };
 
@@ -117,9 +122,9 @@ export const PostOpportunityModal: React.FC<PostOpportunityModalProps> = ({ user
               <div>
                 <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Official URL</label>
                 <input 
-                  type="url"
+                  type="text"
                   className="w-full p-5 bg-slate-50 border-2 border-slate-100 rounded-2xl text-[10px] font-black outline-none focus:border-nfsu-navy"
-                  placeholder="HTTPS://..."
+                  placeholder="www.example.com or https://..."
                   value={formData.externalUrl}
                   onChange={e => setFormData({...formData, externalUrl: e.target.value})}
                 />
@@ -128,6 +133,11 @@ export const PostOpportunityModal: React.FC<PostOpportunityModalProps> = ({ user
           </div>
 
           <div className="pt-6">
+            {submitError && (
+              <div className="mb-4 px-5 py-4 bg-red-50 border-2 border-red-200 rounded-2xl text-[10px] font-black text-red-700 uppercase tracking-widest">
+                {submitError}
+              </div>
+            )}
             <button 
               type="submit" 
               className="w-full py-6 bg-nfsu-navy text-white font-black rounded-3xl shadow-2xl shadow-nfsu-navy/20 hover:bg-nfsu-maroon transition-all uppercase tracking-[0.3em] text-xs border-b-4 border-black/20"

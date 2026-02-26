@@ -59,7 +59,7 @@ export const MyProfile: React.FC<MyProfileProps> = ({ user, onProfileUpdate }) =
                 <img src={user.profilePhoto} className="w-full h-full object-cover rounded-[2rem]" alt="Profile" />
               ) : (
                 <span className="text-nfsu-navy font-black text-6xl italic">
-                  {user.fullName.charAt(0)}
+                  {(user.preferredName || user.fullName).charAt(0)}
                 </span>
               )}
             </div>
@@ -73,7 +73,7 @@ export const MyProfile: React.FC<MyProfileProps> = ({ user, onProfileUpdate }) =
           
           <div className="flex-1 text-center md:text-left">
             <div className="flex flex-wrap items-center gap-3 mb-2 justify-center md:justify-start">
-              <h2 className="text-4xl font-black text-white tracking-tighter uppercase italic">{user.fullName}</h2>
+              <h2 className="text-4xl font-black text-white tracking-tighter uppercase italic">{user.preferredName || user.fullName}</h2>
               <span className="px-3 py-1 bg-white/10 text-nfsu-gold text-[10px] font-black rounded-lg border border-white/20 uppercase tracking-widest">
                 {user.role} LEVEL
               </span>

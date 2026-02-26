@@ -46,7 +46,7 @@ const ROLE_ACTIVITIES: Record<string, Activity[]> = {
     { id: 'directory',   label: 'Campus Directory',    sub: 'Browse all campus clubs, committees, cells, services and library resources.',      tag: 'DIR'   },
     { id: 'canteen',     label: 'Meal Registry',        sub: 'Browse menu, place orders, track order status, and submit canteen feedback.',      tag: 'MEAL'  },
     { id: 'lostfound',   label: 'Lost & Found',         sub: 'Report lost items or claim found assets within campus grounds.',                   tag: 'ITEM'  },
-    { id: 'opportunity', label: 'Career Window',        sub: 'Browse internships, placements, hackathons, and skill-building opportunities.',     tag: 'CAREER'},
+    { id: 'opportunity', label: 'Opportunity Window',  sub: 'Browse internships, placements, hackathons, and skill-building opportunities.',     tag: 'OPP'  },
     { id: 'resources',   label: 'Skill Share',          sub: 'Access question papers, notes, and request or offer peer mentorship sessions.',     tag: 'STUDY' },
     { id: 'grievance',   label: 'Grievance Portal',     sub: 'Report campus issues — academic, hostel, infrastructure, fees, and more.',         tag: 'ISSUE' },
     { id: 'profile',     label: 'Profile Setup',        sub: 'Manage your identity card, profile photo, preferred name, and contact details.',   tag: 'ID'    },
@@ -143,7 +143,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ user, onLogout, onUpdateUs
                   {user.profilePhoto ? (
                     <img src={user.profilePhoto} className="w-full h-full object-cover rounded-[1rem] md:rounded-[1.5rem]" alt="Profile" />
                   ) : (
-                    <span className="text-white font-black text-2xl md:text-3xl italic">{user.fullName.charAt(0)}</span>
+                    <span className="text-white font-black text-2xl md:text-3xl italic">{(user.preferredName || user.fullName).charAt(0)}</span>
                   )}
                 </div>
                 <div className="absolute -bottom-2 -right-2 w-7 h-7 md:w-8 md:h-8 bg-nfsu-gold rounded-full border-4 border-white flex items-center justify-center text-[9px] font-black shadow-lg">ID</div>

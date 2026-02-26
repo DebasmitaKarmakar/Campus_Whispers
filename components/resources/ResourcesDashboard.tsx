@@ -12,7 +12,10 @@ export const ResourcesDashboard: React.FC<{ user: User }> = ({ user }) => {
   const [skillOffers, setSkillOffers] = useState<SkillOffer[]>([]);
   
   // UI States
-  const [showUploadModal, setShowUploadModal] = useState(false);
+  const [showUploadPanel, setShowUploadPanel] = useState(false);
+  const [uploadFile, setUploadFile] = useState<string>('');
+  const [uploadContributor, setUploadContributor] = useState(user.fullName);
+  const [uploadError, setUploadError] = useState('');
   const [showHelpModal, setShowHelpModal] = useState(false);
   const [showSkillOfferModal, setShowSkillOfferModal] = useState(false);
   const [repoFilters, setRepoFilters] = useState({ year: '', semester: '', examType: '' as ExamType | '', branch: '', subject: '' });
@@ -113,12 +116,89 @@ export const ResourcesDashboard: React.FC<{ user: User }> = ({ user }) => {
               <input type="text" className="w-full p-4 bg-white/5 rounded-2xl text-white text-sm font-black border-2 border-white/10 outline-none focus:border-nfsu-gold" placeholder="Cyber" value={repoFilters.subject} onChange={e => setRepoFilters({...repoFilters, subject: e.target.value})} />
             </div>
             <button 
-              onClick={() => setShowUploadModal(true)}
-              className="py-5 bg-nfsu-gold text-nfsu-navy font-black rounded-2xl text-[10px] uppercase tracking-[0.2em] hover:bg-white transition-all shadow-2xl shadow-black/20"
+              onClick={() => { setShowUploadPanel(p => !p); setUploadFile(''); setUploadError(''); setUploadContributor(user.fullName); }}
+              className={`py-5 font-black rounded-2xl text-[10px] uppercase tracking-[0.2em] transition-all shadow-2xl shadow-black/20 ${showUploadPanel ? 'bg-white text-nfsu-navy' : 'bg-nfsu-gold text-nfsu-navy hover:bg-white'}`}
             >
-              Upload {repoType}
+              {showUploadPanel ? 'Cancel' : `Upload ${repoType}`}
             </button>
           </div>
+
+          {/* Inline Upload Panel */}
+          {showUploadPanel && (
+            <div className="bg-white border-2 border-nfsu-gold rounded-[2rem] p-8 shadow-xl space-y-5 animate-fadeIn">
+              <div className="flex items-center justify-between mb-2">
+                <div>
+                  <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Uploading as</div>
+                  <input
+                    type="text"
+                    value={uploadContributor}
+                    onChange={e => setUploadContributor(e.target.value)}
+                    className="mt-1 px-4 py-2 bg-slate-50 border-2 border-slate-100 rounded-xl text-sm font-black uppercase outline-none focus:border-nfsu-navy w-64"
+                    placeholder="Contributor name"
+                  />
+                </div>
+                <div className="text-[9px] font-black text-slate-300 uppercase tracking-widest text-right">
+                  Uses filters above<br/>for Year / Sem / Branch / Subject
+                </div>
+              </div>
+              <div className="border-2 border-dashed border-slate-200 rounded-2xl p-8 text-center bg-slate-50 relative cursor-pointer hover:border-nfsu-gold transition-all">
+                <input
+                  type="file"
+                  accept="application/pdf"
+                  className="absolute inset-0 opacity-0 cursor-pointer z-10"
+                  onChange={e => {
+                    const file = e.target.files?.[0];
+                    if (file && file.type === 'application/pdf') {
+                      const reader = new FileReader();
+                      reader.onloadend = () => setUploadFile(reader.result as string);
+                      reader.readAsDataURL(file);
+                      setUploadError('');
+                    } else {
+                      setUploadError('PDF files only.');
+                    }
+                  }}
+                />
+                <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                  {uploadFile ? 'PDF Loaded — Ready to commit' : 'Click to attach PDF record'}
+                </div>
+              </div>
+              {uploadError && <p className="text-red-500 text-[10px] font-black uppercase tracking-widest">{uploadError}</p>}
+              <div className="flex gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => { setShowUploadPanel(false); setUploadFile(''); setUploadError(''); }}
+                  className="flex-1 py-4 bg-slate-100 text-slate-400 font-black rounded-xl text-[10px] uppercase tracking-widest hover:bg-slate-200 transition-all"
+                >
+                  Discard
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (!uploadFile) { setUploadError('PDF file required.'); return; }
+                    if (!repoFilters.year || !repoFilters.semester || !repoFilters.subject || !repoFilters.branch) {
+                      setUploadError('Fill in Year, Sem, Subject, and Branch in the filters above before uploading.');
+                      return;
+                    }
+                    const fakeUser = { ...user, fullName: uploadContributor || user.fullName };
+                    const res = resourceService.uploadResource(fakeUser, {
+                      year: repoFilters.year,
+                      semester: repoFilters.semester,
+                      examType: repoType === 'Paper' ? (repoFilters.examType || 'End-Sem') as ExamType : undefined,
+                      subject: repoFilters.subject,
+                      branch: repoFilters.branch,
+                      pdfUrl: uploadFile,
+                      resourceType: repoType,
+                    });
+                    if (!res.success) { setUploadError(res.message); }
+                    else { setShowUploadPanel(false); setUploadFile(''); refreshData(); }
+                  }}
+                  className="flex-2 py-4 bg-nfsu-navy text-white font-black rounded-xl text-[10px] uppercase tracking-[0.3em] shadow-xl hover:bg-nfsu-maroon transition-all"
+                >
+                  Commit
+                </button>
+              </div>
+            </div>
+          )}
 
           {/* Resource Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 pb-20">
@@ -129,9 +209,6 @@ export const ResourcesDashboard: React.FC<{ user: User }> = ({ user }) => {
             ) : (
               filteredResources.map(paper => (
                 <div key={paper.id} className="p-8 bg-white rounded-[2rem] border-2 border-slate-100 hover:border-nfsu-navy hover:shadow-2xl transition-all group relative overflow-hidden">
-                   <div className="absolute top-0 right-0 w-32 h-32 bg-slate-50 -rotate-12 translate-x-12 -translate-y-12 flex items-center justify-center opacity-40">
-                      <span className="text-[10px] font-black text-nfsu-navy">{repoType === 'Paper' ? 'DOC' : 'NOTE'}</span>
-                   </div>
                   <div className="flex justify-between items-start mb-6">
                     {repoType === 'Paper' ? (
                        <span className="px-3 py-1 bg-nfsu-navy text-white text-[10px] font-black uppercase rounded-lg border-2 border-black/10">{paper.examType}</span>
@@ -271,9 +348,6 @@ export const ResourcesDashboard: React.FC<{ user: User }> = ({ user }) => {
               ) : (
                 skillOffers.map(offer => (
                   <div key={offer.id} className="p-8 bg-white rounded-[2rem] border-2 border-slate-100 flex flex-col hover:border-nfsu-gold hover:shadow-2xl transition-all group relative overflow-hidden">
-                    <div className="absolute top-0 right-0 w-24 h-24 bg-nfsu-gold/5 -rotate-12 translate-x-8 -translate-y-8 flex items-center justify-center p-4">
-                       <span className="text-[10px] font-black uppercase text-nfsu-navy opacity-40">CERT</span>
-                    </div>
                     <div className="flex justify-between items-start mb-6">
                       <span className={`px-3 py-1 text-[9px] font-black uppercase rounded-lg border-2 ${offer.category === 'Academic' ? 'bg-nfsu-navy text-white border-black/10' : 'bg-nfsu-gold text-nfsu-navy border-white/30'}`}>
                         {offer.category}
@@ -294,9 +368,6 @@ export const ResourcesDashboard: React.FC<{ user: User }> = ({ user }) => {
       )}
 
       {/* --- MODALS --- */}
-      {showUploadModal && (
-        <RepositoryUploadModal user={user} type={repoType} onClose={() => setShowUploadModal(false)} onCreated={() => { setShowUploadModal(false); refreshData(); }} />
-      )}
       {showHelpModal && (
         <HelpRequestModal user={user} onClose={() => setShowHelpModal(false)} onCreated={() => { setShowHelpModal(false); refreshData(); }} />
       )}
@@ -308,70 +379,6 @@ export const ResourcesDashboard: React.FC<{ user: User }> = ({ user }) => {
 };
 
 // Modal Components
-const RepositoryUploadModal: React.FC<{ user: User, type: ResourceCategory, onClose: () => void, onCreated: () => void }> = ({ user, type, onClose, onCreated }) => {
-  const [formData, setFormData] = useState({ year: '', semester: '', examType: 'Mid-Sem' as ExamType, branch: '', subject: '', pdfUrl: '' });
-  const [error, setError] = useState('');
-
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file && file.type === 'application/pdf') {
-      const reader = new FileReader();
-      reader.onloadend = () => setFormData(prev => ({ ...prev, pdfUrl: reader.result as string }));
-      reader.readAsDataURL(file);
-    } else {
-      setError('PDF files only.');
-    }
-  };
-
-  const submit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!formData.pdfUrl) {
-      setError('PDF file required.');
-      return;
-    }
-    const res = resourceService.uploadResource(user, { ...formData, resourceType: type });
-    if (!res.success) setError(res.message); else onCreated();
-  };
-
-  return (
-    <div className="fixed inset-0 bg-nfsu-navy/95 backdrop-blur-sm flex items-center justify-center z-[100] p-4">
-      <div className="bg-white rounded-[2.5rem] w-full max-w-lg shadow-2xl overflow-hidden animate-slideUp border-4 border-nfsu-gold flex flex-col max-h-[90vh]">
-        <div className="bg-nfsu-navy p-6 md:p-8 text-white shrink-0">
-          <h2 className="text-2xl font-black italic uppercase tracking-tighter">Academic Contribution</h2>
-          <p className="text-nfsu-gold text-[10px] font-black uppercase tracking-[0.3em] mt-2">Registry: {type}</p>
-        </div>
-        <form onSubmit={submit} className="p-6 md:p-8 space-y-6 overflow-y-auto scrollbar-hide">
-          <div className="grid grid-cols-2 gap-4">
-            <input required type="text" placeholder="YEAR (2025)" className="p-4 bg-slate-50 rounded-xl text-[11px] font-black uppercase border-2 border-slate-100 outline-none focus:border-nfsu-navy" value={formData.year} onChange={e => setFormData({...formData, year: e.target.value})} />
-            <input required type="text" placeholder="SEM (04)" className="p-4 bg-slate-50 rounded-xl text-[11px] font-black uppercase border-2 border-slate-100 outline-none focus:border-nfsu-navy" value={formData.semester} onChange={e => setFormData({...formData, semester: e.target.value})} />
-          </div>
-          {type === 'Paper' && (
-            <select className="w-full p-4 bg-slate-50 rounded-xl text-[10px] font-black uppercase tracking-widest border-2 border-slate-100 outline-none" value={formData.examType} onChange={e => setFormData({...formData, examType: e.target.value as ExamType})}>
-              <option value="End-Sem">END-SEM</option>
-              <option value="Mid-Sem">MID-SEM</option>
-              <option value="CA1">CA1</option>
-              <option value="CA2">CA2</option>
-            </select>
-          )}
-          <input required type="text" placeholder="SUBJECT NAME" className="w-full p-4 bg-slate-50 rounded-xl text-[11px] font-black uppercase border-2 border-slate-100 outline-none focus:border-nfsu-navy" value={formData.subject} onChange={e => setFormData({...formData, subject: e.target.value})} />
-          <input required type="text" placeholder="BRANCH (E.G. CSE)" className="w-full p-4 bg-slate-50 rounded-xl text-[11px] font-black uppercase border-2 border-slate-100 outline-none focus:border-nfsu-navy" value={formData.branch} onChange={e => setFormData({...formData, branch: e.target.value})} />
-          <input disabled type="text" value={`CONTRIBUTOR: ${user.fullName.toUpperCase()}`} className="w-full p-4 bg-slate-100 rounded-xl text-[10px] font-black text-slate-400 uppercase border-2 border-slate-100 italic" />
-          
-          <div className="border-2 border-dashed border-slate-200 rounded-xl p-8 text-center bg-slate-50 relative group">
-            <input required type="file" accept="application/pdf" onChange={handleFileUpload} className="absolute inset-0 opacity-0 cursor-pointer z-10" />
-            <div className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">{formData.pdfUrl ? 'DOCUMENT LOADED' : 'ATTACH PDF RECORD'}</div>
-          </div>
-          {error && <p className="text-red-500 text-[10px] font-black text-center uppercase">{error}</p>}
-          <div className="flex gap-3 pt-4">
-            <button type="button" onClick={onClose} className="flex-1 py-4 bg-slate-100 text-slate-400 font-black rounded-xl text-[10px] uppercase tracking-widest">Cancel</button>
-            <button type="submit" className="flex-2 py-4 bg-nfsu-navy text-white font-black rounded-xl text-[10px] uppercase tracking-[0.3em] shadow-xl">Commit Registry</button>
-          </div>
-        </form>
-      </div>
-    </div>
-  );
-};
-
 const HelpRequestModal: React.FC<{ user: User, onClose: () => void, onCreated: () => void }> = ({ user, onClose, onCreated }) => {
   const [formData, setFormData] = useState({ topic: '', category: 'Academic' as HelpCategory, sessionType: 'Individual' as SessionType, description: '', preferredTime: '', preferredPlace: '' });
   const submit = (e: React.FormEvent) => { e.preventDefault(); resourceService.createHelpRequest(user.email, formData); onCreated(); };

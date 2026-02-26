@@ -1,28 +1,53 @@
 import { MenuItem, Order, LFItem, OpportunityPost, QuestionPaper, HelpRequest, AdminLog, CampusOrg, AppNotification, NotificationCategory } from '../types';
 
 const DB_PREFIX = 'cw_db_';
-const DB_VERSION = '2.0';
+const DB_VERSION = '3.0';
 
-// Two example organisations — add more via the Campus Directory interface
+// Five static campus directory entries — directory is read-only; no add/edit via UI
 const INITIAL_CAMPUS_ORGS: CampusOrg[] = [
   {
     id: 'ORG-001',
-    name: 'Coding Club',
-    type: 'club',
-    description: 'Competitive programming, hackathons, open-source contributions, and software development workshops for students across all departments.',
-    website: 'https://codingclub.nfsu.ac.in',
-    email: 'coding@nfsu.ac.in',
+    name: 'E-Cell NFSU',
+    type: 'cell',
+    description: 'Entrepreneurship cell fostering startup culture, business ideation, and innovation among NFSU students.',
+    website: 'https://ecell.nfsu.ac.in',
+    email: 'ecell@nfsu.ac.in',
     status: 'active',
-    facultyAdvisor: 'Dr. R. Sharma',
-    socialLinks: { instagram: 'https://instagram.com', github: 'https://github.com' },
   },
   {
     id: 'ORG-002',
     name: 'Central Library',
     type: 'library',
-    description: 'University central library providing access to academic resources, journals, digital repositories, and reference services.',
+    description: 'University central library providing access to academic journals, digital repositories, and reference services.',
     website: 'https://library.nfsu.ac.in',
     email: 'library@nfsu.ac.in',
+    status: 'active',
+  },
+  {
+    id: 'ORG-003',
+    name: 'NSS Unit',
+    type: 'service',
+    description: 'National Service Scheme unit coordinating community service, social outreach, and volunteer programmes at NFSU.',
+    website: 'https://nss.nfsu.ac.in',
+    email: 'nss@nfsu.ac.in',
+    status: 'active',
+  },
+  {
+    id: 'ORG-004',
+    name: 'Coding Club',
+    type: 'club',
+    description: 'Student-run club for competitive programming, hackathons, open-source contributions, and software development workshops.',
+    website: 'https://codingclub.nfsu.ac.in',
+    email: 'coding@nfsu.ac.in',
+    status: 'active',
+  },
+  {
+    id: 'ORG-005',
+    name: 'Literary Society',
+    type: 'committee',
+    description: 'Campus literary body organising debates, creative writing workshops, poetry events, and publication of the student journal.',
+    website: 'https://literary.nfsu.ac.in',
+    email: 'literary@nfsu.ac.in',
     status: 'active',
   },
 ];

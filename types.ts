@@ -265,7 +265,9 @@ export type NotificationCategory =
   | 'new_notice'
   | 'event_declared'
   | 'lostfound_action'
-  | 'skill_help_request';
+  | 'skill_help_request'
+  | 'grievance_reported'
+  | 'opportunity_deadline';
 
 export interface AppNotification {
   id: string;

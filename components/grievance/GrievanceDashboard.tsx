@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { User } from '../../types';
 import { dbService } from '../../services/dbService';
+import { getWhitelistEntries } from '../../services/authService';
 
 export type GrievanceCategory =
   | 'Academic'
@@ -34,6 +35,8 @@ export interface Grievance {
   adminResponse?: string;
   createdAt: number;
   updatedAt: number;
+  votes: number;
+  votedBy: string[];
 }
 
 interface GrievanceDashboardProps {
@@ -75,6 +78,7 @@ const PRIORITY_COLORS: Record<GrievancePriority, string> = {
 export const GrievanceDashboard: React.FC<GrievanceDashboardProps> = ({ user }) => {
   const [grievances, setGrievances] = useState<Grievance[]>([]);
   const [view, setView] = useState<'list' | 'new' | 'detail'>('list');
+  const [grievanceView, setGrievanceView] = useState<'all' | 'mine'>('all');
   const [selected, setSelected] = useState<Grievance | null>(null);
   const [filterCat, setFilterCat] = useState<GrievanceCategory | 'All'>('All');
   const [filterStatus, setFilterStatus] = useState<GrievanceStatus | 'All'>('All');
@@ -89,11 +93,7 @@ export const GrievanceDashboard: React.FC<GrievanceDashboardProps> = ({ user }) 
 
   const refresh = () => {
     const all = dbService.getTable<Grievance>('grievances');
-    if (user.role === 'admin') {
-      setGrievances(all);
-    } else {
-      setGrievances(all.filter(g => g.reporterId === user.id));
-    }
+    setGrievances(all);
   };
 
   useEffect(() => {
@@ -117,12 +117,47 @@ export const GrievanceDashboard: React.FC<GrievanceDashboardProps> = ({ user }) 
       status: 'Open',
       createdAt: Date.now(),
       updatedAt: Date.now(),
+      votes: 0,
+      votedBy: [],
     };
     const all = dbService.getTable<Grievance>('grievances');
     dbService.saveTable('grievances', [g, ...all]);
+
+    // Broadcast to all registered users
+    const allUsers = getWhitelistEntries();
+    const recipientEmails = allUsers
+      .map(u => u.email)
+      .filter(e => e !== user.email);
+    dbService.broadcastNotification(
+      recipientEmails,
+      'grievance_reported',
+      `New Grievance: ${g.category}`,
+      `A new grievance has been filed: "${g.subject}". You can view and vote on it in the Grievance Portal.`,
+      g.id
+    );
+
     setNewGrievance({ category: 'Academic', priority: 'Medium', subject: '', description: '', isAnonymous: false });
     refresh();
     setView('list');
+  };
+
+  const handleVote = (grievanceId: string) => {
+    const all = dbService.getTable<Grievance>('grievances');
+    const g = all.find(x => x.id === grievanceId);
+    if (!g) return;
+    const alreadyVoted = g.votedBy.includes(user.email);
+    const updatedVotedBy = alreadyVoted
+      ? g.votedBy.filter(e => e !== user.email)
+      : [...g.votedBy, user.email];
+    dbService.updateRow<Grievance>('grievances', grievanceId, {
+      votes: updatedVotedBy.length,
+      votedBy: updatedVotedBy,
+    });
+    refresh();
+    if (selected?.id === grievanceId) {
+      const updated = dbService.getTable<Grievance>('grievances').find(x => x.id === grievanceId);
+      if (updated) setSelected(updated);
+    }
   };
 
   const updateStatus = (id: string, status: GrievanceStatus, response?: string) => {
@@ -134,10 +169,13 @@ export const GrievanceDashboard: React.FC<GrievanceDashboardProps> = ({ user }) 
     }
   };
 
-  const filtered = grievances.filter(g =>
-    (filterCat === 'All' || g.category === filterCat) &&
-    (filterStatus === 'All' || g.status === filterStatus)
-  );
+  const filtered = grievances
+    .filter(g => grievanceView === 'mine' ? g.reporterId === user.id : true)
+    .filter(g =>
+      (filterCat === 'All' || g.category === filterCat) &&
+      (filterStatus === 'All' || g.status === filterStatus)
+    )
+    .sort((a, b) => (b.votes || 0) - (a.votes || 0));
 
   const stats = {
     total: grievances.length,
@@ -145,6 +183,8 @@ export const GrievanceDashboard: React.FC<GrievanceDashboardProps> = ({ user }) 
     review: grievances.filter(g => g.status === 'Under Review').length,
     resolved: grievances.filter(g => g.status === 'Resolved').length,
   };
+
+  const myGrievances = grievances.filter(g => g.reporterId === user.id);
 
   if (view === 'new') {
     return (
@@ -271,6 +311,25 @@ export const GrievanceDashboard: React.FC<GrievanceDashboardProps> = ({ user }) 
               <p className="text-sm text-slate-700 font-bold leading-relaxed">{selected.description}</p>
             </div>
 
+            <div className="flex items-center gap-4">
+              <button
+                onClick={() => handleVote(selected.id)}
+                className={`flex items-center gap-2 px-6 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest border-2 transition-all ${
+                  (selected.votedBy || []).includes(user.email)
+                    ? 'bg-nfsu-maroon text-white border-nfsu-maroon'
+                    : 'bg-white text-slate-600 border-slate-200 hover:border-nfsu-maroon hover:text-nfsu-maroon'
+                }`}
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M3.293 9.707a1 1 0 010-1.414l6-6a1 1 0 011.414 0l6 6a1 1 0 01-1.414 1.414L11 5.414V17a1 1 0 11-2 0V5.414L4.707 9.707a1 1 0 01-1.414 0z" clipRule="evenodd" />
+                </svg>
+                {(selected.votedBy || []).includes(user.email) ? 'Voted' : 'Upvote'} ({selected.votes || 0})
+              </button>
+              <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                {selected.votes || 0} student{(selected.votes || 0) !== 1 ? 's' : ''} flagged this as important
+              </span>
+            </div>
+
             {selected.adminResponse && (
               <div className="bg-green-50 border-2 border-green-100 rounded-2xl p-6">
                 <div className="text-[10px] font-black text-green-600 uppercase tracking-widest mb-3">Administrative Response</div>
@@ -351,26 +410,41 @@ export const GrievanceDashboard: React.FC<GrievanceDashboardProps> = ({ user }) 
         </div>
       </div>
 
-      {/* Filters */}
-      <div className="flex flex-wrap gap-4">
-        <select
-          value={filterCat}
-          onChange={e => setFilterCat(e.target.value as GrievanceCategory | 'All')}
-          className="px-5 py-3 bg-white border-2 border-slate-100 rounded-2xl text-[10px] font-black uppercase outline-none focus:border-nfsu-navy transition-all shadow-sm"
-        >
-          <option value="All">All Categories</option>
-          {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
-        </select>
-        <select
-          value={filterStatus}
-          onChange={e => setFilterStatus(e.target.value as GrievanceStatus | 'All')}
-          className="px-5 py-3 bg-white border-2 border-slate-100 rounded-2xl text-[10px] font-black uppercase outline-none focus:border-nfsu-navy transition-all shadow-sm"
-        >
-          <option value="All">All Statuses</option>
-          {(['Open', 'Under Review', 'Resolved', 'Rejected'] as GrievanceStatus[]).map(s => (
-            <option key={s} value={s}>{s}</option>
+      {/* Tabs and Filters */}
+      <div className="flex flex-wrap gap-4 items-center justify-between">
+        <div className="flex gap-2 bg-slate-100 p-1.5 rounded-2xl border-2 border-slate-200">
+          {(['all', 'mine'] as const).map(t => (
+            <button
+              key={t}
+              onClick={() => setGrievanceView(t)}
+              className={`px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${
+                grievanceView === t ? 'bg-white text-nfsu-navy shadow-md' : 'text-slate-400 hover:text-slate-600'
+              }`}
+            >
+              {t === 'all' ? 'All Grievances' : 'My Reports'}
+            </button>
           ))}
-        </select>
+        </div>
+        <div className="flex flex-wrap gap-4">
+          <select
+            value={filterCat}
+            onChange={e => setFilterCat(e.target.value as GrievanceCategory | 'All')}
+            className="px-5 py-3 bg-white border-2 border-slate-100 rounded-2xl text-[10px] font-black uppercase outline-none focus:border-nfsu-navy transition-all shadow-sm"
+          >
+            <option value="All">All Categories</option>
+            {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+          </select>
+          <select
+            value={filterStatus}
+            onChange={e => setFilterStatus(e.target.value as GrievanceStatus | 'All')}
+            className="px-5 py-3 bg-white border-2 border-slate-100 rounded-2xl text-[10px] font-black uppercase outline-none focus:border-nfsu-navy transition-all shadow-sm"
+          >
+            <option value="All">All Statuses</option>
+            {(['Open', 'Under Review', 'Resolved', 'Rejected'] as GrievanceStatus[]).map(s => (
+              <option key={s} value={s}>{s}</option>
+            ))}
+          </select>
+        </div>
       </div>
 
       {/* List */}
@@ -384,7 +458,7 @@ export const GrievanceDashboard: React.FC<GrievanceDashboardProps> = ({ user }) 
         ) : (
           <div className="divide-y divide-slate-50">
             {filtered.map(g => (
-              <button
+                <button
                 key={g.id}
                 onClick={() => { setSelected(g); setView('detail'); }}
                 className="w-full text-left p-8 hover:bg-slate-50 transition-all group border-l-4 border-transparent hover:border-nfsu-maroon"
@@ -401,7 +475,22 @@ export const GrievanceDashboard: React.FC<GrievanceDashboardProps> = ({ user }) 
                       {g.id} • {g.isAnonymous ? 'Anonymous' : g.reporterName} • {new Date(g.createdAt).toLocaleDateString()}
                     </div>
                   </div>
-                  <div className="text-nfsu-gold font-black text-[10px] uppercase tracking-[0.3em] group-hover:translate-x-1 transition-transform">View →</div>
+                  <div className="flex items-center gap-4">
+                    <button
+                      onClick={e => { e.stopPropagation(); handleVote(g.id); }}
+                      className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest border-2 transition-all ${
+                        (g.votedBy || []).includes(user.email)
+                          ? 'bg-nfsu-maroon text-white border-nfsu-maroon'
+                          : 'bg-white text-slate-500 border-slate-200 hover:border-nfsu-maroon hover:text-nfsu-maroon'
+                      }`}
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M3.293 9.707a1 1 0 010-1.414l6-6a1 1 0 011.414 0l6 6a1 1 0 01-1.414 1.414L11 5.414V17a1 1 0 11-2 0V5.414L4.707 9.707a1 1 0 01-1.414 0z" clipRule="evenodd" />
+                      </svg>
+                      {g.votes || 0}
+                    </button>
+                    <div className="text-nfsu-gold font-black text-[10px] uppercase tracking-[0.3em] group-hover:translate-x-1 transition-transform">View</div>
+                  </div>
                 </div>
               </button>
             ))}
