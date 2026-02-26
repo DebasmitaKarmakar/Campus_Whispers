@@ -136,7 +136,7 @@ const TRUST_VALIDITY_MS: Record<Role, number> = {
   admin:   7  * 24 * 60 * 60 * 1000,
   faculty: 7 * 24 * 60 * 60 * 1000,
   canteen: 7 * 24 * 60 * 60 * 1000,
-  student: 7 * 24 * 60 * 60 * 1000,
+  student: 14 * 24 * 60 * 60 * 1000,
 };
 
 const DEVICE_TRUST_KEY = 'cw_device_trust';
