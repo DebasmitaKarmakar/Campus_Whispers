@@ -27,7 +27,11 @@ export const LostFoundDashboard: React.FC<{ user: User }> = ({ user }) => {
 
     if (activeTab === 'Lost') return item.type === 'LostReport' && item.status !== 'Collected';
     if (activeTab === 'Found') return item.type === 'FoundReport' && item.status !== 'Collected';
-    if (activeTab === 'My Posts') return item.reporterEmail === user.email;
+    if (activeTab === 'My Posts') return (
+      item.reporterEmail === user.email ||   // original poster (lost or found report)
+      item.finderEmail   === user.email ||   // person who reported finding a lost item
+      item.claimantEmail === user.email      // person who claimed a found item as theirs
+    );
     
     return item.status !== 'Collected';
   });

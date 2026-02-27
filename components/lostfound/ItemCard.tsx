@@ -16,6 +16,9 @@ export const ItemCard: React.FC<ItemCardProps> = ({ item, currentUser, onAction 
   const [commentText, setCommentText] = useState('');
 
   const isOwner = item.reporterEmail === currentUser.email;
+  // For a FoundReport that has been claimed: the claimant is the true owner
+  const isClaimant = item.claimantEmail === currentUser.email;
+  const isFinder   = item.finderEmail   === currentUser.email;
   
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -148,13 +151,13 @@ export const ItemCard: React.FC<ItemCardProps> = ({ item, currentUser, onAction 
             {!isOwner && item.status === 'Found' && (
               <button onClick={() => setShowActionModal('Claim')} className="w-full py-3 bg-nfsu-maroon text-white rounded-xl text-[10px] font-black uppercase tracking-[0.2em] shadow-lg shadow-nfsu-maroon/10 border-b-4 border-black/20 transition-all active:translate-y-0.5">Claim Ownership</button>
             )}
-            {(item.finderEmail === currentUser.email || (isOwner && item.type === 'FoundReport')) && !item.handoverImage && item.status === 'PendingHandover' && (
+            {(isFinder || (isOwner && item.type === 'FoundReport')) && !item.handoverImage && item.status === 'PendingHandover' && (
               <button onClick={() => setShowActionModal('Handover')} className="w-full py-3 bg-nfsu-gold text-nfsu-navy rounded-xl text-[10px] font-black uppercase tracking-[0.2em] shadow-lg shadow-nfsu-gold/10 border-b-4 border-black/20 transition-all active:translate-y-0.5">Upload Verification Proof</button>
             )}
-            {isOwner && item.status === 'PendingHandover' && item.handoverImage && (
+            {(isClaimant || (isOwner && item.type === 'LostReport')) && item.status === 'PendingHandover' && item.handoverImage && (
               <button onClick={confirmCollected} className="w-full py-3 bg-slate-900 text-white rounded-xl text-[10px] font-black uppercase tracking-[0.2em] shadow-xl transition-all active:translate-y-0.5">Verify & Close Case</button>
             )}
-            {isOwner && item.status === 'PendingHandover' && !item.handoverImage && (
+            {(isClaimant || (isOwner && item.type === 'LostReport')) && item.status === 'PendingHandover' && !item.handoverImage && (
               <div className="text-[9px] text-nfsu-gold font-black uppercase text-center bg-nfsu-navy p-3 rounded-xl tracking-widest">Awaiting Identity Verification Image</div>
             )}
           </div>

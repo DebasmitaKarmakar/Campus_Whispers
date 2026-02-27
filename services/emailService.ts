@@ -45,7 +45,7 @@ export const sendTOTPEmail = async (
       {
         to_email: toEmail,   // used in template "To Email" field as {{to_email}}
         to_name:  toName,    // {{to_name}} in template body
-        otp:      totpCode,  // {{otp}} in template body
+        totp:      totpCode,  // {{otp}} in template body
       },
       { publicKey: PUBLIC_KEY }
     );

@@ -1,4 +1,4 @@
-import { MenuItem, Order, LFItem, OpportunityPost, QuestionPaper, HelpRequest, AdminLog, CampusOrg, AppNotification, NotificationCategory } from '../types';
+import { MenuItem, Order, LFItem, OpportunityPost, QuestionPaper, HelpRequest, AdminLog, CampusOrg, AppNotification, NotificationCategory, MicroHelpPost } from '../types';
 
 const DB_PREFIX = 'cw_db_';
 const DB_VERSION = '3.0';
@@ -52,6 +52,46 @@ const INITIAL_CAMPUS_ORGS: CampusOrg[] = [
   },
 ];
 
+const MICRO_HELP_SEED_POSTS: MicroHelpPost[] = [
+  {
+    id: 'MH-SEED-001',
+    posterEmail: 'student.seed@nfsu.ac.in',
+    posterName: 'A Fellow Student',
+    isAnonymous: true,
+    title: 'Need old BCA/B.Tech textbooks — sem 1 to 4',
+    description:
+      'Hi, I am looking for old textbooks for Semester 1 to 4 (BCA/B.Tech programs). ' +
+      'Subjects like Data Structures, OS, DBMS, Maths, C Programming etc. ' +
+      'Would be very helpful if someone can lend or donate them. Happy to pay a small amount too.',
+    category: 'Textbooks',
+    contactInfo: 'Please connect via the offer button or ask admin to relay your contact.',
+    status: 'Approved',
+    createdAt: Date.now() - 7 * 24 * 60 * 60 * 1000,
+    reviewedBy: 'admin@nfsu.ac.in',
+    reviewNote: 'Verified seed post — genuine need.',
+    reviewedAt: Date.now() - 6 * 24 * 60 * 60 * 1000,
+  },
+  {
+    id: 'MH-SEED-002',
+    posterEmail: 'student.seed2@nfsu.ac.in',
+    posterName: 'A Fellow Student',
+    isAnonymous: true,
+    title: 'Need ₹1200 for ATKT Form Fillup — urgent',
+    description:
+      'I have an ATKT in one subject and the form fillup deadline is approaching. ' +
+      'I am unable to arrange ₹1200 right now due to family financial issues. ' +
+      'Any kind help — loan, donation, or guidance on fee waiver — would mean a lot. ' +
+      'I can repay once I receive my scholarship amount next month.',
+    category: 'ATKT / Exam Fee',
+    contactInfo: 'I will share contact privately via admin to maintain privacy.',
+    status: 'Approved',
+    createdAt: Date.now() - 3 * 24 * 60 * 60 * 1000,
+    reviewedBy: 'admin@nfsu.ac.in',
+    reviewNote: 'Verified seed post — genuine need.',
+    reviewedAt: Date.now() - 2 * 24 * 60 * 60 * 1000,
+  },
+];
+
 export const dbService = {
   init: () => {
     const currentVersion = localStorage.getItem(`${DB_PREFIX}version`);
@@ -72,6 +112,12 @@ export const dbService = {
       const orgs = dbService.getTable<CampusOrg>('campus_orgs');
       if (orgs.length === 0) {
         dbService.saveTable('campus_orgs', INITIAL_CAMPUS_ORGS);
+      }
+
+      // Seed MicroHelp posts if empty
+      const microHelpPosts = dbService.getTable('microhelp_posts');
+      if (microHelpPosts.length === 0) {
+        dbService.saveTable('microhelp_posts', MICRO_HELP_SEED_POSTS);
       }
 
       dbService.saveTable('admin_logs', []);

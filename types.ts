@@ -296,3 +296,51 @@ export interface VerificationRequest {
   comment?: string;
   reviewedAt?: number;
 }
+
+// ─── Micro Help Across Campus ─────────────────────────────────────────────
+
+export type MicroHelpCategory =
+  | 'Textbooks'
+  | 'Financial Aid'
+  | 'ATKT / Exam Fee'
+  | 'Stationery'
+  | 'Medical'
+  | 'Transport'
+  | 'Food'
+  | 'Mental Health'
+  | 'Other';
+
+export type MicroHelpStatus =
+  | 'PendingReview'
+  | 'Approved'
+  | 'Rejected'
+  | 'Deleted'
+  | 'Resolved';
+
+export interface MicroHelpPost {
+  id: string;
+  posterEmail: string;
+  posterName: string;
+  isAnonymous: boolean;
+  title: string;
+  description: string;
+  category: MicroHelpCategory;
+  documentUrl?: string;
+  documentName?: string;
+  paymentQrUrl?: string;
+  contactInfo?: string;
+  status: MicroHelpStatus;
+  reviewedBy?: string;
+  reviewNote?: string;
+  reviewedAt?: number;
+  createdAt: number;
+}
+
+export interface MicroHelpOffer {
+  id: string;
+  postId: string;
+  offererEmail: string;
+  offererName: string;
+  message: string;
+  createdAt: number;
+}

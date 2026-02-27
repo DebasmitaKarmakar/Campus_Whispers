@@ -24,7 +24,7 @@ const SEED_WHITELIST: WhitelistEntry[] = [
 
   // Faculty
   { email: 'fac@gmail.com',                          role: 'faculty', id: 3000, fullName: 'Faculty Member',        department: 'Forensic Science'     },
-  { email: 'debasmitak10@gmail.com',                 role: 'faculty', id: 2001, fullName: 'Debasmita Karmakar',    department: 'Computer Science'     },
+  { email: 'dishac981@gmail.com',                    role: 'faculty', id: 3001, fullName: 'Faculty Member 2',      department: 'Forensic Science'     },
 
   // Canteen
   { email: 'ct@gmail.com',                           role: 'canteen', id: 1000, fullName: 'Canteen Operator',      department: 'Canteen Management'   },
@@ -48,15 +48,32 @@ const buildMap = (entries: WhitelistEntry[]): Map<string, WhitelistEntry> => {
   return map;
 };
 
-/** Load all whitelist entries from localStorage (seeds once if empty). */
+/** Load all whitelist entries from localStorage, always merging seed entries so
+ *  hardcoded additions appear on existing installs without wiping user-added data. */
 const loadEntries = (): WhitelistEntry[] => {
+  let stored: WhitelistEntry[] = [];
   try {
     const raw = localStorage.getItem(WHITELIST_STORAGE_KEY);
-    if (raw) return JSON.parse(raw) as WhitelistEntry[];
+    if (raw) stored = JSON.parse(raw) as WhitelistEntry[];
   } catch { /* ignore */ }
-  // First load — seed with defaults
-  localStorage.setItem(WHITELIST_STORAGE_KEY, JSON.stringify(SEED_WHITELIST));
-  return SEED_WHITELIST;
+
+  // Merge: add any seed entry whose email+role combo is missing from stored
+  let changed = false;
+  for (const seed of SEED_WHITELIST) {
+    const exists = stored.some(
+      e => e.email.toLowerCase() === seed.email.toLowerCase() && e.role === seed.role
+    );
+    if (!exists) {
+      stored.push(seed);
+      changed = true;
+    }
+  }
+
+  if (changed || stored.length === 0) {
+    localStorage.setItem(WHITELIST_STORAGE_KEY, JSON.stringify(stored));
+  }
+
+  return stored.length > 0 ? stored : SEED_WHITELIST;
 };
 
 const saveEntries = (entries: WhitelistEntry[]): void => {
@@ -134,9 +151,9 @@ export const getWhitelistEntries = (): WhitelistEntry[] => loadEntries();
 
 const TRUST_VALIDITY_MS: Record<Role, number> = {
   admin:   7  * 24 * 60 * 60 * 1000,
-  faculty: 7 * 24 * 60 * 60 * 1000,
-  canteen: 7 * 24 * 60 * 60 * 1000,
-  student: 14 * 24 * 60 * 60 * 1000,
+  faculty: 14 * 24 * 60 * 60 * 1000,
+  canteen: 30 * 24 * 60 * 60 * 1000,
+  student: 30 * 24 * 60 * 60 * 1000,
 };
 
 const DEVICE_TRUST_KEY = 'cw_device_trust';

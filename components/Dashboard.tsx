@@ -13,6 +13,7 @@ import { CampusDirectory } from './directory/CampusDirectory';
 import { FacultyDashboard } from './faculty/FacultyDashboard';
 import { NoticeBoard } from './noticeboard/NoticeBoard';
 import { NotificationBell } from './notifications/NotificationBell';
+import { MicroHelpDashboard } from './microhelp/MicroHelpDashboard';
 
 interface DashboardProps {
   user: User;
@@ -31,7 +32,8 @@ type ViewType =
   | 'grievance'
   | 'directory'
   | 'faculty_review'
-  | 'noticeboard';
+  | 'noticeboard'
+  | 'microhelp';
 
 interface Activity {
   id: string;
@@ -49,6 +51,7 @@ const ROLE_ACTIVITIES: Record<string, Activity[]> = {
     { id: 'opportunity', label: 'Opportunity Window',  sub: 'Browse internships, placements, hackathons, and skill-building opportunities.',     tag: 'OPP'  },
     { id: 'resources',   label: 'Skill Share',          sub: 'Access question papers, notes, and request or offer peer mentorship sessions.',     tag: 'STUDY' },
     { id: 'grievance',   label: 'Grievance Portal',     sub: 'Report campus issues — academic, hostel, infrastructure, fees, and more.',         tag: 'ISSUE' },
+    { id: 'microhelp',   label: 'MicroHelp',             sub: 'Ask for help with textbooks, exam fees, financial aid or any campus need.',         tag: 'HELP'  },
     { id: 'profile',     label: 'Profile Setup',        sub: 'Manage your identity card, profile photo, preferred name, and contact details.',   tag: 'ID'    },
   ],
   faculty: [
@@ -58,12 +61,14 @@ const ROLE_ACTIVITIES: Record<string, Activity[]> = {
     { id: 'opportunity',    label: 'Opportunity Review',sub: 'Review and validate student-posted opportunities and career listings.',             tag: 'OPP'   },
     { id: 'lostfound',      label: 'Lost & Found',      sub: 'Review sensitive lost and found reports requiring institutional oversight.',        tag: 'ITEM'  },
     { id: 'grievance',      label: 'Grievance View',    sub: 'View grievances relevant to academic and institutional matters.',                   tag: 'ISSUE' },
+    { id: 'microhelp',      label: 'MicroHelp Review',  sub: 'Review, approve or reject student help requests before they go live.',              tag: 'HELP'  },
     { id: 'profile',        label: 'Profile Setup',     sub: 'Manage your faculty identity card and institutional preferences.',                  tag: 'ID'    },
   ],
   canteen: [
     { id: 'canteen',   label: 'Service Operations', sub: 'Manage active order pipeline, mark orders as served, and update inventory.',        tag: 'OPS'   },
     { id: 'lostfound', label: 'Lost & Found',       sub: 'Report found items and assist in identity-bound asset recovery on campus.',          tag: 'ITEM'  },
     { id: 'grievance', label: 'Grievance View',     sub: 'View grievances related to canteen service and campus facilities.',                  tag: 'ISSUE' },
+    { id: 'microhelp', label: 'MicroHelp Board',    sub: 'View approved student help requests — textbooks, financial aid and more.',            tag: 'HELP'  },
     { id: 'profile',   label: 'Profile Setup',      sub: 'Manage your staff identity card, contact details, and display preferences.',         tag: 'ID'    },
   ],
   admin: [
@@ -75,6 +80,7 @@ const ROLE_ACTIVITIES: Record<string, Activity[]> = {
     { id: 'opportunity', label: 'Opportunity Review', sub: 'Approve, reject, expire, or directly post verified opportunities for students.',    tag: 'OPP'   },
     { id: 'resources',   label: 'Resource Oversight', sub: 'Moderate uploaded academic papers, notes, and skill-share mentorship requests.',    tag: 'STUDY' },
     { id: 'grievance',   label: 'Grievance Management',sub: 'Review, respond to, categorize, and resolve all student-filed campus grievances.', tag: 'ISSUE' },
+    { id: 'microhelp',   label: 'MicroHelp Control',  sub: 'Review help requests, approve or reject, and oversee the support board.',           tag: 'HELP'  },
     { id: 'profile',     label: 'Profile Setup',      sub: 'Manage your administrative identity card, photo, and institutional preferences.',   tag: 'ID'    },
   ],
 };
@@ -124,6 +130,8 @@ export const Dashboard: React.FC<DashboardProps> = ({ user, onLogout, onUpdateUs
         return <FacultyDashboard user={user} />;
       case 'noticeboard':
         return <NoticeBoard user={user} />;
+      case 'microhelp':
+        return <MicroHelpDashboard user={user} />;
       default:
         return renderHome();
     }

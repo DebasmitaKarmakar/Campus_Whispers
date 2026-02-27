@@ -14,7 +14,7 @@ const DIRECTORY_ENTRIES: DirectoryEntry[] = [
     id: 'ecell',
     name: 'E-Cell NFSU',
     description: 'Entrepreneurship cell fostering startup culture, business ideation, and innovation among NFSU students.',
-    website: 'https://ecell.nfsu.ac.in',
+    website: 'https://e-cell-website-live.vercel.app/events-detail.html?id=2',
     email: 'ecell@nfsu.ac.in',
   },
   {
@@ -35,7 +35,7 @@ const DIRECTORY_ENTRIES: DirectoryEntry[] = [
     id: 'coding-club',
     name: 'Coding Club',
     description: 'Student-run club for competitive programming, hackathons, open-source contributions, and software development workshops.',
-    website: 'https://codingclub.nfsu.ac.in',
+    website: 'https://codingclub-nfsu.vercel.app/',
     email: 'coding@nfsu.ac.in',
   },
   {
