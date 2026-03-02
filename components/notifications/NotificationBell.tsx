@@ -3,19 +3,25 @@ import { AppNotification, NotificationCategory } from '../../types';
 import { dbService } from '../../services/dbService';
 
 const CATEGORY_LABELS: Record<NotificationCategory, string> = {
-  food_served:       'Food Ready',
-  new_notice:        'New Notice',
-  event_declared:    'Event',
-  lostfound_action:  'Lost & Found',
-  skill_help_request:'Skill Help',
+  food_served: 'Food Ready',
+  new_notice: 'New Notice',
+  event_declared: 'Event',
+  lostfound_action: 'Lost & Found',
+  skill_help_request: 'Skill Help',
+
+  grievance_reported: 'Grievance Update',
+  opportunity_deadline: 'Opportunity Deadline',
 };
 
 const CATEGORY_ACCENT: Record<NotificationCategory, string> = {
-  food_served:       'bg-green-100 text-green-800 border-green-200',
-  new_notice:        'bg-amber-100 text-amber-800 border-amber-200',
-  event_declared:    'bg-blue-100 text-blue-800 border-blue-200',
-  lostfound_action:  'bg-purple-100 text-purple-800 border-purple-200',
-  skill_help_request:'bg-teal-100 text-teal-800 border-teal-200',
+  food_served: 'bg-green-100 text-green-800 border-green-200',
+  new_notice: 'bg-amber-100 text-amber-800 border-amber-200',
+  event_declared: 'bg-blue-100 text-blue-800 border-blue-200',
+  lostfound_action: 'bg-purple-100 text-purple-800 border-purple-200',
+  skill_help_request: 'bg-teal-100 text-teal-800 border-teal-200',
+
+  grievance_reported: 'bg-red-100 text-red-800 border-red-200',
+  opportunity_deadline: 'bg-yellow-100 text-yellow-800 border-yellow-200',
 };
 
 function timeAgo(ts: number): string {

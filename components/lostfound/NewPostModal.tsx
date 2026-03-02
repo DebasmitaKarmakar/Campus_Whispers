@@ -42,7 +42,7 @@ export const NewPostModal: React.FC<NewPostModalProps> = ({ type, user, onClose,
       <div className="bg-white rounded-3xl w-full max-w-xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
         <div className={`p-6 text-white ${type === 'LostReport' ? 'bg-red-600' : 'bg-emerald-600'} flex justify-between items-center`}>
           <h2 className="text-xl font-bold">{type === 'LostReport' ? 'Report Lost Item' : 'Report Found Item'}</h2>
-          <button onClick={onClose} className="p-2 hover:bg-white/10 rounded-full transition-colors">✕</button>
+          <button onClick={onClose} className="p-2 hover:bg-white/10 rounded-full transition-colors">x</button>
         </div>
 
         <form onSubmit={handleSubmit} className="p-8 space-y-4 overflow-y-auto">
@@ -103,7 +103,7 @@ export const NewPostModal: React.FC<NewPostModalProps> = ({ type, user, onClose,
                 {formData.itemImage ? (
                   <div className="relative inline-block">
                     <img src={formData.itemImage} className="max-h-32 rounded-lg" alt="Preview" />
-                    <button type="button" onClick={() => setFormData({...formData, itemImage: ''})} className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 text-xs">✕</button>
+                    <button type="button" onClick={() => setFormData({...formData, itemImage: ''})} className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 text-xs">x</button>
                   </div>
                 ) : (
                   <>

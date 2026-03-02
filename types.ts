@@ -1,8 +1,6 @@
 export type Role = 'student' | 'admin' | 'faculty' | 'canteen';
 export type AccountStatus = 'Active' | 'Disabled';
 
-// --- Whitelist Entry ---
-
 export interface WhitelistEntry {
   email: string;
   role: Role;
@@ -10,8 +8,6 @@ export interface WhitelistEntry {
   fullName: string;
   department: string;
 }
-
-// --- Administrative ---
 
 export interface AdminLog {
   id: string;
@@ -23,8 +19,6 @@ export interface AdminLog {
   timestamp: number;
   details?: string;
 }
-
-// --- Auth User ---
 
 export interface User {
   id: string;
@@ -45,8 +39,6 @@ export interface AuthState {
   isAuthenticated: boolean;
 }
 
-// --- Device Trust ---
-
 export interface TrustedDevice {
   deviceId: string;
   email: string;
@@ -54,8 +46,6 @@ export interface TrustedDevice {
   trustedAt: number;
   expiresAt: number;
 }
-
-// --- Campus Directory ---
 
 export type OrgType = 'club' | 'library' | 'committee' | 'cell' | 'service';
 export type OrgStatus = 'active' | 'inactive';
@@ -79,8 +69,6 @@ export interface CampusOrg {
   status?: OrgStatus;
   facultyAdvisor?: string;
 }
-
-// --- Canteen Module ---
 
 export type MealType = 'Breakfast' | 'Lunch' | 'Dinner';
 export type OrderStatus = 'Pending' | 'Served' | 'Expired' | 'Cancelled';
@@ -133,8 +121,6 @@ export interface GeneralFeedback {
   reporterEmail?: string;
 }
 
-// --- Lost & Found ---
-
 export type LFCategory = 'ID Card' | 'Wallet' | 'Electronics' | 'Documents' | 'Keys' | 'Other';
 export type LFStatus = 'Lost' | 'Found' | 'PendingHandover' | 'Collected';
 export type LFPostType = 'LostReport' | 'FoundReport';
@@ -168,8 +154,6 @@ export interface LFItem {
   comments: LFComment[];
 }
 
-// --- Opportunities ---
-
 export type OpportunityStatus = 'Pending' | 'Active' | 'Expired' | 'Rejected';
 export type OpportunityMode = 'Online' | 'Offline' | 'Hybrid';
 
@@ -187,8 +171,6 @@ export interface OpportunityPost {
   posterRole: Role;
   createdAt: number;
 }
-
-// --- Resources ---
 
 export type ExamType = 'End-Sem' | 'Mid-Sem' | 'CA1' | 'CA2';
 export type ResourceCategory = 'Paper' | 'Notes';
@@ -239,8 +221,6 @@ export interface SkillOffer {
   createdAt: number;
 }
 
-// --- Notice Board ---
-
 export type NoticeAudience = 'all' | 'student' | 'faculty';
 export type NoticePriority = 'Normal' | 'Important' | 'Urgent';
 
@@ -257,8 +237,6 @@ export interface Notice {
   createdAt: number;
   isArchived: boolean;
 }
-
-// --- Notifications ---
 
 export type NotificationCategory =
   | 'food_served'
@@ -280,8 +258,6 @@ export interface AppNotification {
   refId?: string;
 }
 
-// --- Faculty Verification ---
-
 export type VerificationStatus = 'Pending' | 'Approved' | 'Rejected';
 
 export interface VerificationRequest {
@@ -297,50 +273,149 @@ export interface VerificationRequest {
   reviewedAt?: number;
 }
 
-// ─── Micro Help Across Campus ─────────────────────────────────────────────
+// ---------------------------------------------------------------------------
+// Micro-Help Module
+// ---------------------------------------------------------------------------
 
 export type MicroHelpCategory =
-  | 'Textbooks'
-  | 'Financial Aid'
-  | 'ATKT / Exam Fee'
-  | 'Stationery'
-  | 'Medical'
-  | 'Transport'
-  | 'Food'
-  | 'Mental Health'
+  | 'Academics'
+  | 'Coding'
+  | 'Design'
+  | 'Research'
+  | 'Language'
+  | 'Career'
   | 'Other';
 
-export type MicroHelpStatus =
+export type MicroHelpPostStatus =
   | 'PendingReview'
-  | 'Approved'
-  | 'Rejected'
-  | 'Deleted'
-  | 'Resolved';
+  | 'Open'
+  | 'InProgress'
+  | 'Resolved'
+  | 'Archived'
+  | 'Closed';
 
 export interface MicroHelpPost {
   id: string;
-  posterEmail: string;
-  posterName: string;
-  isAnonymous: boolean;
+  authorEmail: string;
+  authorName: string;
+  authorRole: Role;
   title: string;
   description: string;
   category: MicroHelpCategory;
-  documentUrl?: string;
-  documentName?: string;
-  paymentQrUrl?: string;
+  status: MicroHelpPostStatus;
+  helperEmail?: string;
+  helperName?: string;
+  createdAt: number;
+  resolvedAt?: number;
+  isAnonymous: boolean;
+  // extended fields
   contactInfo?: string;
-  status: MicroHelpStatus;
+  paymentQrUrl?: string;    // base64 image
+  documentUrl?: string;     // base64 file
+  documentName?: string;
+  reviewNote?: string;
+  reviewedBy?: string;
+  reviewedAt?: number;
+}
+
+export type MicroHelpOfferStatus = 'Pending' | 'Accepted' | 'Declined';
+
+export interface MicroHelpOffer {
+  id: string;
+  postId: string;
+  offerEmail: string;
+  offerName: string;
+  message: string;
+  status: MicroHelpOfferStatus;
+  createdAt: number;
+}
+
+// ---------------------------------------------------------------------------
+// Attendance Module
+// ---------------------------------------------------------------------------
+
+export type Weekday =
+  | 'Monday'
+  | 'Tuesday'
+  | 'Wednesday'
+  | 'Thursday'
+  | 'Friday'
+  | 'Saturday';
+
+export interface TimetableSlot {
+  id: string;
+  branch: string;
+  semester: string;
+  weekday: Weekday;
+  startTime: string;
+  endTime: string;
+  subjectName: string;
+  subjectCode: string;
+  facultyEmail: string;
+  facultyName: string;
+  classOrder: number;
+  isActive: boolean;
+  createdAt: number;
+}
+
+export type SessionStatus = 'Scheduled' | 'Live' | 'Closed' | 'Cancelled';
+
+export interface AttendanceSession {
+  id: string;
+  slotId: string;
+  date: string;
+  branch: string;
+  semester: string;
+  weekday: Weekday;
+  startTime: string;
+  endTime: string;
+  subjectName: string;
+  subjectCode: string;
+  facultyEmail: string;
+  facultyName: string;
+  status: SessionStatus;
+  openedAt?: number;
+  closedAt?: number;
+  isExtra?: boolean;
+  rescheduledFrom?: string;
+  note?: string;
+}
+
+export interface AttendanceRecord {
+  id: string;
+  sessionId: string;
+  slotId: string;
+  studentEmail: string;
+  studentName: string;
+  enrollmentNo: string;
+  markedAt: number;
+  date: string;
+  subjectName: string;
+  subjectCode: string;
+  branch: string;
+  semester: string;
+}
+
+export interface ClassReschedule {
+  id: string;
+  slotId: string;
+  requestedBy: string;
+  type: 'Reschedule' | 'Extra';
+  originalDate?: string;
+  newDate: string;
+  newStartTime: string;
+  newEndTime: string;
+  reason: string;
+  status: 'Pending' | 'Approved' | 'Rejected';
   reviewedBy?: string;
   reviewNote?: string;
   reviewedAt?: number;
   createdAt: number;
 }
 
-export interface MicroHelpOffer {
-  id: string;
-  postId: string;
-  offererEmail: string;
-  offererName: string;
-  message: string;
-  createdAt: number;
+export interface StudentAcademicMeta {
+  email: string;
+  semester: string;
+  branch: string;
+  isArchived: boolean;
 }

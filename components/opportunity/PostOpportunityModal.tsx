@@ -47,7 +47,7 @@ export const PostOpportunityModal: React.FC<PostOpportunityModalProps> = ({ user
         <div className="bg-nfsu-navy p-10 text-white">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-3xl font-black italic uppercase tracking-tighter">Share Opportunity</h2>
-            <button onClick={onClose} className="p-3 hover:bg-white/10 rounded-full transition-colors font-black">✕</button>
+            <button onClick={onClose} className="p-3 hover:bg-white/10 rounded-full transition-colors font-black">x</button>
           </div>
           <p className="text-nfsu-gold text-[10px] font-black uppercase tracking-[0.3em]">
             {user.role === 'admin' 
