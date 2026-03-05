@@ -14,7 +14,6 @@ import { FacultyDashboard } from './faculty/FacultyDashboard';
 import { NoticeBoard } from './noticeboard/NoticeBoard';
 import { NotificationBell } from './notifications/NotificationBell';
 import { AttendanceDashboard } from './attendance/AttendanceDashboard';
-import { MicroHelpDashboard } from './microhelp/MicroHelpDashboard';
 
 interface DashboardProps {
   user: User;
@@ -34,8 +33,7 @@ type ViewType =
   | 'directory'
   | 'faculty_review'
   | 'noticeboard'
-  | 'attendance'
-  | 'microhelp';
+  | 'attendance';
 
 interface Activity {
   id: string;
@@ -48,7 +46,6 @@ const ROLE_ACTIVITIES: Record<string, Activity[]> = {
   student: [
     { id: 'noticeboard', label: 'Notice Board',       sub: 'Official notices and announcements from faculty and administration.',              tag: 'NTC'   },
     { id: 'attendance',  label: 'My Attendance',      sub: 'View subject-wise, weekly, monthly, and overall attendance percentages.',          tag: 'ATT'   },
-    { id: 'microhelp',   label: 'MicroHelp',           sub: 'Request or offer small-scale financial, material, or medical help within campus.', tag: 'HELP'  },
     { id: 'directory',   label: 'Campus Directory',   sub: 'Browse all campus clubs, committees, cells, services and library resources.',     tag: 'DIR'   },
     { id: 'canteen',     label: 'Meal Registry',      sub: 'Browse menu, place orders, track order status, and submit canteen feedback.',     tag: 'MEAL'  },
     { id: 'lostfound',   label: 'Lost & Found',       sub: 'Report lost items or claim found assets within campus grounds.',                  tag: 'ITEM'  },
@@ -60,7 +57,6 @@ const ROLE_ACTIVITIES: Record<string, Activity[]> = {
   faculty: [
     { id: 'noticeboard',    label: 'Notice Board',      sub: 'Publish official notices and view all campus announcements.',                    tag: 'NTC'   },
     { id: 'attendance',     label: 'Class Attendance',  sub: 'Open sessions, scan student faces for live attendance, and manage schedules.',   tag: 'ATT'   },
-    { id: 'microhelp',      label: 'MicroHelp',         sub: 'Moderate and approve community help requests (financial, material, medical).',   tag: 'HELP'  },
     { id: 'faculty_review', label: 'Verification Panel',sub: 'Approve or reject events, coordinator claims, notices, and flagged content.',   tag: 'VERIFY'},
     { id: 'directory',      label: 'Campus Directory',  sub: 'View and manage the centralized campus organization and service registry.',      tag: 'DIR'   },
     { id: 'opportunity',    label: 'Opportunity Review',sub: 'Review and validate student-posted opportunities and career listings.',          tag: 'OPP'   },
@@ -77,7 +73,6 @@ const ROLE_ACTIVITIES: Record<string, Activity[]> = {
   admin: [
     { id: 'noticeboard', label: 'Notice Board',         sub: 'Publish official notices and oversee all campus announcements.',                    tag: 'NTC'   },
     { id: 'attendance',  label: 'Timetable Control',    sub: 'Build weekly class schedules, run session refresh, and approve reschedule requests.', tag: 'ATT'  },
-    { id: 'microhelp',   label: 'MicroHelp',            sub: 'Review, approve, or reject community help requests and manage the help board.',      tag: 'HELP'  },
     { id: 'directory',   label: 'Campus Directory',     sub: 'View and oversee the centralized campus organization registry.',                    tag: 'DIR'   },
     { id: 'students',    label: 'Identity Governance',  sub: 'Manage whitelist, add or disable accounts, and review full access audit logs.',     tag: 'GOV'   },
     { id: 'canteen',     label: 'Canteen Audit',        sub: 'Review operational compliance, monitor all orders, and analyze feedback reports.',  tag: 'AUDIT' },
@@ -136,8 +131,6 @@ export const Dashboard: React.FC<DashboardProps> = ({ user, onLogout, onUpdateUs
         return <NoticeBoard user={user} />;
       case 'attendance':
         return <AttendanceDashboard user={user} />;
-      case 'microhelp':
-        return <MicroHelpDashboard user={user} />;
       default:
         return renderHome();
     }

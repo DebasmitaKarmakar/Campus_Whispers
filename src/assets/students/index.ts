@@ -33,7 +33,6 @@
 // Comment out any student whose photo is not yet available.
 // ---------------------------------------------------------------------------
 
-import s4000 from './4000.jpg';
 import s4001 from './4001.jpg';
 
 
@@ -42,7 +41,6 @@ import s4001 from './4001.jpg';
 // ---------------------------------------------------------------------------
 
 export const STUDENT_PHOTOS: Record<number, string> = {
-4000: s4000,
 4001: s4001,
 };
 
